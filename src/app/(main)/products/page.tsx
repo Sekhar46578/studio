@@ -158,7 +158,7 @@ export default function ProductsPage() {
                     </TableCell>
                     <TableCell className="font-medium">{product.name}</TableCell>
                     <TableCell>{product.stock}</TableCell>
-                    <TableCell className="hidden md:table-cell">${product.price.toFixed(2)}</TableCell>
+                    <TableCell className="hidden md:table-cell">₹{product.price.toFixed(2)}</TableCell>
                     <TableCell className="hidden md:table-cell">{product.category}</TableCell>
                     <TableCell>
                       <DropdownMenu>
