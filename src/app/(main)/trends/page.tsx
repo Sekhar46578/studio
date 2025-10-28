@@ -3,7 +3,13 @@
 import { useState } from "react";
 import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useTranslation } from "@/lib/hooks/use-translation";
 import { analyzeSalesTrends, type AnalyzeSalesTrendsOutput } from "@/ai/flows/analyze-sales-trends";
 import { INITIAL_PRODUCTS, MOCK_SALES } from "@/lib/constants";
