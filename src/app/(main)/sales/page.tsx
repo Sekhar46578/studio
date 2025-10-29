@@ -41,15 +41,22 @@ export default function SalesPage() {
 
   const updateSaleItem = (index: number, field: keyof SaleItem, value: string | number) => {
     const items = [...newSaleItems];
-    const product = products.find(p => p.id === (field === 'productId' ? value : items[index].productId));
-    if (field === 'productId' && product) {
-      items[index] = { ...items[index], productId: value as string, priceAtSale: product.price };
+    const itemToUpdate = { ...items[index] };
+    
+    if (field === 'productId') {
+        const product = products.find(p => p.id === value);
+        if (product) {
+            itemToUpdate.productId = value as string;
+            itemToUpdate.priceAtSale = product.price;
+        }
     } else if (field === 'quantity') {
         const quantity = Number(value);
-        if(quantity > 0) {
-            items[index] = { ...items[index], [field]: quantity };
+        if (quantity > 0) {
+            itemToUpdate.quantity = quantity;
         }
     }
+
+    items[index] = itemToUpdate;
     setNewSaleItems(items);
   };
   
