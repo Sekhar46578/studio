@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Package, ShoppingCart, LineChart, Archive } from "lucide-react";
+import { Home, Package, ShoppingCart, LineChart, Archive, History } from "lucide-react";
 import { useTranslation } from "@/lib/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import {
@@ -18,7 +18,8 @@ export function Nav() {
   const menuItems = [
     { href: "/", label: t.dashboard, icon: Home },
     { href: "/products", label: t.products, icon: Package },
-    { href: "/sales", label: t.sales, icon: ShoppingCart },
+    { href: "/sales", label: t.recordSale, icon: ShoppingCart },
+    { href: "/history", label: t.salesHistory, icon: History },
     { href: "/trends", label: t.trends, icon: LineChart },
     { href: "/inventory", label: t.inventory, icon: Archive },
   ];
