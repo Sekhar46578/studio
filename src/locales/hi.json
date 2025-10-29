@@ -44,5 +44,11 @@
   "orderingPlanModifications": "ऑर्डरिंग सलाह",
   "additionalInsights": "और अधिक जानकारी",
   "analysisError": "बिक्री का विश्लेषण नहीं हो सका। कृपया फिर से प्रयास करें।",
-  "unitsSold": "यूनिट बिकीं"
+  "unitsSold": "यूनिट बिकीं",
+  "signup": "साइन अप करें",
+  "noAccount": "खाता नहीं है?",
+  "hasAccount": "पहले से ही एक खाता है?",
+  "createAccount": "खाता बनाएं",
+  "signupPrompt": "शुरू करने के लिए अपना विवरण भरें।",
+  "name": "नाम"
 }

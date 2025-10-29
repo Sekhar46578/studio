@@ -44,5 +44,11 @@
   "orderingPlanModifications": "Ordering Advice",
   "additionalInsights": "More Insights",
   "analysisError": "Could not analyze sales. Please try again.",
-  "unitsSold": "units sold"
+  "unitsSold": "units sold",
+  "signup": "Sign Up",
+  "noAccount": "Don't have an account?",
+  "hasAccount": "Already have an account?",
+  "createAccount": "Create an Account",
+  "signupPrompt": "Fill in your details to get started.",
+  "name": "Name"
 }

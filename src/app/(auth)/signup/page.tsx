@@ -20,27 +20,29 @@ import { Logo } from '@/components/icons';
 import { useTranslation } from '@/lib/hooks/use-translation';
 
 const formSchema = z.object({
+  name: z.string().min(1, { message: 'Name is required.' }),
   email: z.string().email({ message: 'Please enter a valid email.' }),
-  password: z.string().min(1, { message: 'Password is required.' }),
+  password: z.string().min(6, { message: 'Password must be at least 6 characters.' }),
 });
 
-type LoginFormValues = z.infer<typeof formSchema>;
+type SignupFormValues = z.infer<typeof formSchema>;
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { signup } = useAuth();
   const { t } = useTranslation();
   
-  const form = useForm<LoginFormValues>({
+  const form = useForm<SignupFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: '',
       email: '',
       password: '',
     },
   });
 
-  const onSubmit = (data: LoginFormValues) => {
-    login(data.email);
+  const onSubmit = (data: SignupFormValues) => {
+    signup(data.name, data.email);
     router.push('/');
   };
 
@@ -51,11 +53,24 @@ export default function LoginPage() {
           <div className="flex justify-center items-center mb-4">
             <Logo className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl">{t.appName}</CardTitle>
-          <CardDescription>{t.loginPrompt}</CardDescription>
+          <CardTitle className="text-2xl">{t.createAccount}</CardTitle>
+          <CardDescription>{t.signupPrompt}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">{t.name}</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Your Name"
+                required
+                {...form.register('name')}
+              />
+              {form.formState.errors.name && (
+                <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
+              )}
+            </div>
             <div className="space-y-2">
               <Label htmlFor="email">{t.email}</Label>
               <Input
@@ -82,13 +97,13 @@ export default function LoginPage() {
               )}
             </div>
             <Button type="submit" className="w-full">
-              {t.login}
+              {t.signup}
             </Button>
           </form>
            <div className="mt-4 text-center text-sm">
-            {t.noAccount}{" "}
-            <Link href="/signup" className="underline">
-              {t.signup}
+            {t.hasAccount}{" "}
+            <Link href="/login" className="underline">
+              {t.login}
             </Link>
           </div>
         </CardContent>

@@ -9,6 +9,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string) => void;
   logout: () => void;
+  signup: (name: string, email: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -32,9 +33,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = (email: string) => {
+    // This is a mock login. In a real app, you'd find the user.
+    // For now, we'll just create a user with the provided email.
     const mockUser: User = { name: 'Shop Owner', email };
     localStorage.setItem('shopstock-user', JSON.stringify(mockUser));
     setUser(mockUser);
+  };
+  
+  const signup = (name: string, email: string) => {
+    const newUser: User = { name, email };
+    localStorage.setItem('shopstock-user', JSON.stringify(newUser));
+    setUser(newUser);
   };
 
   const logout = () => {
@@ -55,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, signup }}>
       {children}
     </AuthContext.Provider>
   );
