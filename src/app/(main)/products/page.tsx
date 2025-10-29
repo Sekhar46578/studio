@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -76,7 +77,7 @@ export default function ProductsPage() {
               <div>
                 <CardTitle>{t.productManagement}</CardTitle>
                 <CardDescription>
-                  Manage your products and view their inventory.
+                  Add, edit, and manage your products.
                 </CardDescription>
               </div>
               <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
@@ -92,7 +93,7 @@ export default function ProductsPage() {
                   <DialogHeader>
                     <DialogTitle>{t.addNewProduct}</DialogTitle>
                     <DialogDescription>
-                      Add details for the new product.
+                      Fill in the details to add a new product to your inventory.
                     </DialogDescription>
                   </DialogHeader>
                   <form onSubmit={handleAddProduct}>

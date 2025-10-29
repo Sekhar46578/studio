@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -70,7 +71,7 @@ export default function TrendsPage() {
               <div className="mb-4 sm:mb-0">
                 <CardTitle>{t.salesTrendAnalysis}</CardTitle>
                 <CardDescription>
-                  Use AI to analyze sales trends and get recommendations.
+                  Get advice on how to improve your sales and manage stock.
                 </CardDescription>
               </div>
               <Button onClick={handleAnalyze} disabled={loading}>

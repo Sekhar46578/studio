@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -159,7 +160,7 @@ export default function SalesPage() {
         toast({
             variant: "destructive",
             title: "Cannot record sale",
-            description: "Please add items to the sale.",
+            description: "Please add items to the sale first.",
         });
         return;
     }
@@ -175,8 +176,8 @@ export default function SalesPage() {
     MOCK_SALES.unshift(newSale);
     
     toast({
-      title: "Sale Recorded",
-      description: `Sale of ₹${newSaleTotal.toFixed(2)} has been successfully recorded.`,
+      title: "Sale Recorded!",
+      description: `Your sale of ₹${newSaleTotal.toFixed(2)} has been saved.`,
     });
 
     setNewSaleItems([]);
@@ -192,7 +193,7 @@ export default function SalesPage() {
                 <div>
                   <CardTitle>{t.recordSale}</CardTitle>
                   <CardDescription>
-                      Add products to record a new sales transaction.
+                      Add products to create a new sale.
                   </CardDescription>
                 </div>
                 <Dialog open={isScannerOpen} onOpenChange={setScannerOpen}>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -95,7 +96,7 @@ export default function DashboardPage() {
                 <div className="mb-4 sm:mb-0">
                   <CardTitle>{t.salesTrendAnalysis}</CardTitle>
                   <CardDescription>
-                    Use AI to analyze sales trends and get recommendations.
+                    Get advice on how to improve your sales and manage stock.
                   </CardDescription>
                 </div>
                 <Button onClick={handleAnalyze} disabled={loading} className="w-full sm:w-auto">
@@ -132,7 +133,7 @@ export default function DashboardPage() {
         <div className="lg:col-span-2">
             <Card>
                 <CardHeader>
-                    <CardTitle>Daily Sales</CardTitle>
+                    <CardTitle>Today's Sales</CardTitle>
                     <CardDescription>
                         A summary of sales made today. Total: ₹{todaysTotal.toFixed(2)}
                     </CardDescription>
@@ -160,7 +161,7 @@ export default function DashboardPage() {
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={2} className="text-center">No sales today.</TableCell>
+                                    <TableCell colSpan={2} className="text-center">No sales today. Keep going!</TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
