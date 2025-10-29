@@ -7,6 +7,7 @@ export type Product = {
   lowStockThreshold: number;
   category: string;
   imageUrl: string;
+  barcode?: string;
 };
 
 export type SaleItem = {

@@ -59,6 +59,7 @@ export default function ProductsPage() {
       stock: Number(formData.get("stock")),
       lowStockThreshold: Number(formData.get("lowStockThreshold")),
       category: formData.get("category") as string,
+      barcode: formData.get("barcode") as string,
       imageUrl: `https://picsum.photos/seed/${Date.now()}/400/300`,
     };
     setProducts([newProduct, ...products]);
@@ -121,6 +122,10 @@ export default function ProductsPage() {
                           <Label htmlFor="category" className="text-right">{t.category}</Label>
                           <Input id="category" name="category" className="col-span-3" required />
                         </div>
+                         <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="barcode" className="text-right">Barcode</Label>
+                          <Input id="barcode" name="barcode" className="col-span-3" />
+                        </div>
                       </div>
                     </ScrollArea>
                     <DialogFooter>
@@ -140,6 +145,7 @@ export default function ProductsPage() {
                   <TableHead>{t.productName}</TableHead>
                   <TableHead className="hidden md:table-cell">{t.stock}</TableHead>
                   <TableHead className="hidden md:table-cell">{t.price}</TableHead>
+                   <TableHead className="hidden lg:table-cell">Barcode</TableHead>
                   <TableHead className="hidden lg:table-cell">{t.category}</TableHead>
                   <TableHead>
                     <span className="sr-only">Actions</span>
@@ -162,6 +168,7 @@ export default function ProductsPage() {
                     <TableCell className="font-medium">{product.name}</TableCell>
                     <TableCell className="hidden md:table-cell">{product.stock}</TableCell>
                     <TableCell className="hidden md:table-cell">₹{product.price.toFixed(2)}</TableCell>
+                    <TableCell className="hidden lg:table-cell">{product.barcode}</TableCell>
                     <TableCell className="hidden lg:table-cell">{product.category}</TableCell>
                     <TableCell>
                       <DropdownMenu>
