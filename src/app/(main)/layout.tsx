@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect } from 'react';
@@ -14,6 +15,7 @@ import {
 import { Logo } from '@/components/icons';
 import { Nav } from '@/components/nav';
 import Link from 'next/link';
+import { ProductStoreProvider } from '@/store/products.tsx';
 
 export default function MainLayout({
   children,
@@ -38,24 +40,26 @@ export default function MainLayout({
   }
 
   return (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarHeader>
-          <Link href="/" className="flex items-center gap-2">
-            <Logo className="h-7 w-7 text-primary" />
-            <span className="text-lg font-semibold text-sidebar-foreground">
-              ShopStock
-            </span>
-          </Link>
-        </SidebarHeader>
-        <SidebarContent>
-          <Nav />
-        </SidebarContent>
-        <SidebarFooter/>
-      </Sidebar>
-      <SidebarInset>
-        {children}
-      </SidebarInset>
-    </SidebarProvider>
+    <ProductStoreProvider>
+      <SidebarProvider>
+        <Sidebar>
+          <SidebarHeader>
+            <Link href="/" className="flex items-center gap-2">
+              <Logo className="h-7 w-7 text-primary" />
+              <span className="text-lg font-semibold text-sidebar-foreground">
+                ShopStock
+              </span>
+            </Link>
+          </SidebarHeader>
+          <SidebarContent>
+            <Nav />
+          </SidebarContent>
+          <SidebarFooter/>
+        </Sidebar>
+        <SidebarInset>
+          {children}
+        </SidebarInset>
+      </SidebarProvider>
+    </ProductStoreProvider>
   );
 }

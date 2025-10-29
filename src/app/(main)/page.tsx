@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import { format } from "date-fns";
 import { AlertTriangle, TrendingUp } from "lucide-react";
 import { Header } from "@/components/header";
 import {
@@ -13,8 +12,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { INITIAL_PRODUCTS, MOCK_SALES } from "@/lib/constants";
-import type { Product, Sale } from "@/lib/types";
+import { MOCK_SALES } from "@/lib/constants";
+import type { Sale } from "@/lib/types";
 import { useTranslation } from "@/lib/hooks/use-translation";
 import { analyzeSalesTrends, type AnalyzeSalesTrendsOutput } from "@/ai/flows/analyze-sales-trends";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,10 +26,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useProductStore } from "@/store/products";
 
 export default function DashboardPage() {
   const { t } = useTranslation();
-  const [products] = useState<Product[]>(INITIAL_PRODUCTS);
+  const products = useProductStore((state) => state.products);
   const [sales] = useState<Sale[]>(MOCK_SALES);
   
   const [loading, setLoading] = useState(false);
@@ -44,7 +44,7 @@ export default function DashboardPage() {
     try {
       const salesHistory = JSON.stringify(MOCK_SALES);
       const currentStockLevels = JSON.stringify(
-        INITIAL_PRODUCTS.map(p => ({ name: p.name, stock: p.stock }))
+        products.map(p => ({ name: p.name, stock: p.stock }))
       );
 
       const result = await analyzeSalesTrends({ salesHistory, currentStockLevels });

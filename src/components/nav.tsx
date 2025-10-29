@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -17,7 +18,6 @@ export function Nav() {
 
   const menuItems = [
     { href: "/", label: t.dashboard, icon: Home },
-    { href: "/products", label: t.products, icon: Package },
     { href: "/sales", label: t.recordSale, icon: ShoppingCart },
     { href: "/history", label: t.salesHistory, icon: History },
     { href: "/trends", label: t.trends, icon: LineChart },

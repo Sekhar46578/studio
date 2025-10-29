@@ -1,3 +1,4 @@
+
 import type { Product, Sale } from '@/lib/types';
 
 export const INITIAL_PRODUCTS: Product[] = [
@@ -133,6 +134,50 @@ export const INITIAL_PRODUCTS: Product[] = [
     imageUrl: 'https://images.unsplash.com/photo-1683009118690-a5851ccb1112?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxmcmVzaCUyMHRvbWF0b2VzfGVufDB8fHx8MTc2MTU5NDQ1MXww&ixlib=rb-4.1.0&q=80&w=1080',
     barcode: '8902233445566',
   },
+  {
+    id: 'prod_13',
+    name: 'Parle-G Biscuits',
+    description: 'Classic glucose biscuits, pack of 10.',
+    price: 50,
+    stock: 200,
+    lowStockThreshold: 50,
+    category: 'Snacks',
+    imageUrl: 'https://picsum.photos/seed/biscuit/400/300',
+    barcode: '8901234567891'
+  },
+  {
+    id: 'prod_14',
+    name: 'Lays Classic Salted',
+    description: 'Crispy potato chips, classic salted flavor.',
+    price: 20,
+    stock: 150,
+    lowStockThreshold: 40,
+    category: 'Snacks',
+    imageUrl: 'https://picsum.photos/seed/chips/400/300',
+    barcode: '8901234567892'
+  },
+  {
+    id: 'prod_15',
+    name: 'Coca-Cola',
+    description: '500ml bottle of Coca-Cola.',
+    price: 40,
+    stock: 100,
+    lowStockThreshold: 25,
+    category: 'Beverages',
+    imageUrl: 'https://picsum.photos/seed/cola/400/300',
+    barcode: '8901234567893'
+  },
+  {
+    id: 'prod_16',
+    name: 'Cadbury Dairy Milk',
+    description: 'Classic milk chocolate bar.',
+    price: 45,
+    stock: 180,
+    lowStockThreshold: 60,
+    category: 'Chocolates',
+    imageUrl: 'https://picsum.photos/seed/chocolate/400/300',
+    barcode: '8901234567894'
+  }
 ];
 
 

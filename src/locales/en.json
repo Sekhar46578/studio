@@ -2,7 +2,6 @@
 {
   "appName": "ShopStock",
   "dashboard": "Dashboard",
-  "products": "Products",
   "sales": "Sales",
   "trends": "Trends",
   "inventory": "Inventory",
