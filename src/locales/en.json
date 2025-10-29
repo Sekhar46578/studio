@@ -50,5 +50,6 @@
   "hasAccount": "Already have an account?",
   "createAccount": "Create an Account",
   "signupPrompt": "Fill in your details to get started.",
-  "name": "Name"
+  "name": "Name",
+  "profile": "Profile"
 }

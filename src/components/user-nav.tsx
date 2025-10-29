@@ -17,10 +17,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/components/auth-provider";
 import { useTranslation } from "@/lib/hooks/use-translation";
+import { useRouter } from "next/navigation";
 
 export function UserNav() {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
+  const router = useRouter();
 
   if (!user) return null;
 
@@ -36,7 +38,7 @@ export function UserNav() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage src="/avatars/01.png" alt={`@${user.name}`} />
+            <AvatarImage src={user.picture} alt={`@${user.name}`} />
             <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
           </Avatar>
         </Button>
@@ -52,6 +54,9 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
+           <DropdownMenuItem onSelect={() => router.push('/profile')}>
+            {t.profile}
+          </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => logout()}>
             {t.logout}
           </DropdownMenuItem>

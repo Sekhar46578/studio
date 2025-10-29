@@ -10,6 +10,7 @@ interface AuthContextType {
   login: (email: string) => void;
   logout: () => void;
   signup: (name: string, email: string) => void;
+  updateUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -35,13 +36,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = (email: string) => {
     // This is a mock login. In a real app, you'd find the user.
     // For now, we'll just create a user with the provided email.
-    const mockUser: User = { name: 'Shop Owner', email };
+    const mockUser: User = { name: 'Shop Owner', email, picture: '/avatars/01.png' };
     localStorage.setItem('shopstock-user', JSON.stringify(mockUser));
     setUser(mockUser);
   };
   
   const signup = (name: string, email: string) => {
-    const newUser: User = { name, email };
+    const newUser: User = { name, email, picture: '/avatars/01.png' };
     localStorage.setItem('shopstock-user', JSON.stringify(newUser));
     setUser(newUser);
   };
@@ -50,6 +51,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('shopstock-user');
     setUser(null);
   };
+
+  const updateUser = (updatedUser: User) => {
+    localStorage.setItem('shopstock-user', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  }
 
   if (loading) {
     return (
@@ -64,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, signup }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, signup, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
