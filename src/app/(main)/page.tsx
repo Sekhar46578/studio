@@ -87,8 +87,8 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen w-full flex-col">
       <Header title={t.dashboard} />
-      <main className="flex-1 p-4 sm:p-6 grid gap-6 md:grid-cols-2">
-        <div className="md:col-span-2">
+      <main className="flex-1 p-4 sm:p-6 grid gap-6 md:grid-cols-1 lg:grid-cols-2">
+        <div className="lg:col-span-2">
           <Card>
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -98,7 +98,7 @@ export default function DashboardPage() {
                     Use AI to analyze sales trends and get recommendations.
                   </CardDescription>
                 </div>
-                <Button onClick={handleAnalyze} disabled={loading}>
+                <Button onClick={handleAnalyze} disabled={loading} className="w-full sm:w-auto">
                   <TrendingUp className="mr-2 h-4 w-4" />
                   {loading ? t.analyzing : t.analyzeTrends}
                 </Button>
@@ -129,7 +129,7 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        <div>
+        <div className="lg:col-span-2">
             <Card>
                 <CardHeader>
                     <CardTitle>Daily Sales</CardTitle>

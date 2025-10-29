@@ -41,6 +41,7 @@ import { INITIAL_PRODUCTS } from "@/lib/constants";
 import type { Product } from "@/lib/types";
 import { useTranslation } from "@/lib/hooks/use-translation";
 import Image from "next/image";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function ProductsPage() {
   const { t } = useTranslation();
@@ -94,32 +95,34 @@ export default function ProductsPage() {
                     </DialogDescription>
                   </DialogHeader>
                   <form onSubmit={handleAddProduct}>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="name" className="text-right">{t.productName}</Label>
-                        <Input id="name" name="name" className="col-span-3" required />
+                    <ScrollArea className="h-[60vh] sm:h-auto">
+                      <div className="grid gap-4 py-4 px-2">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="name" className="text-right">{t.productName}</Label>
+                          <Input id="name" name="name" className="col-span-3" required />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="description" className="text-right">{t.productDescription}</Label>
+                          <Input id="description" name="description" className="col-span-3" required />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="price" className="text-right">{t.price}</Label>
+                          <Input id="price" name="price" type="number" className="col-span-3" required />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="stock" className="text-right">{t.initialStock}</Label>
+                          <Input id="stock" name="stock" type="number" className="col-span-3" required />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="lowStockThreshold" className="text-right">{t.lowStockThreshold}</Label>
+                          <Input id="lowStockThreshold" name="lowStockThreshold" type="number" className="col-span-3" required />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="category" className="text-right">{t.category}</Label>
+                          <Input id="category" name="category" className="col-span-3" required />
+                        </div>
                       </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="description" className="text-right">{t.productDescription}</Label>
-                        <Input id="description" name="description" className="col-span-3" required />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="price" className="text-right">{t.price}</Label>
-                        <Input id="price" name="price" type="number" className="col-span-3" required />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="stock" className="text-right">{t.initialStock}</Label>
-                        <Input id="stock" name="stock" type="number" className="col-span-3" required />
-                      </div>
-                       <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="lowStockThreshold" className="text-right">{t.lowStockThreshold}</Label>
-                        <Input id="lowStockThreshold" name="lowStockThreshold" type="number" className="col-span-3" required />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="category" className="text-right">{t.category}</Label>
-                        <Input id="category" name="category" className="col-span-3" required />
-                      </div>
-                    </div>
+                    </ScrollArea>
                     <DialogFooter>
                       <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>{t.cancel}</Button>
                       <Button type="submit">{t.save}</Button>
@@ -135,9 +138,9 @@ export default function ProductsPage() {
                 <TableRow>
                   <TableHead className="hidden w-[100px] sm:table-cell">Image</TableHead>
                   <TableHead>{t.productName}</TableHead>
-                  <TableHead>{t.stock}</TableHead>
+                  <TableHead className="hidden md:table-cell">{t.stock}</TableHead>
                   <TableHead className="hidden md:table-cell">{t.price}</TableHead>
-                  <TableHead className="hidden md:table-cell">{t.category}</TableHead>
+                  <TableHead className="hidden lg:table-cell">{t.category}</TableHead>
                   <TableHead>
                     <span className="sr-only">Actions</span>
                   </TableHead>
@@ -157,9 +160,9 @@ export default function ProductsPage() {
                       />
                     </TableCell>
                     <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell>{product.stock}</TableCell>
+                    <TableCell className="hidden md:table-cell">{product.stock}</TableCell>
                     <TableCell className="hidden md:table-cell">₹{product.price.toFixed(2)}</TableCell>
-                    <TableCell className="hidden md:table-cell">{product.category}</TableCell>
+                    <TableCell className="hidden lg:table-cell">{product.category}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

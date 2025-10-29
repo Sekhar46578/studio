@@ -68,7 +68,7 @@ export default function HistoryPage() {
                       id="date"
                       variant={"outline"}
                       className={cn(
-                        "w-[300px] justify-start text-left font-normal",
+                        "w-full sm:w-[300px] justify-start text-left font-normal",
                         !date && "text-muted-foreground"
                       )}
                     >
@@ -102,7 +102,7 @@ export default function HistoryPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t.date}</TableHead>
+                  <TableHead className="w-[100px] sm:w-auto">{t.date}</TableHead>
                   <TableHead>Products</TableHead>
                   <TableHead className="text-right">{t.total}</TableHead>
                 </TableRow>
@@ -110,7 +110,8 @@ export default function HistoryPage() {
               <TableBody>
                 {filteredSales.map((sale) => (
                   <TableRow key={sale.id}>
-                    <TableCell>{format(new Date(sale.date), "PPP")}</TableCell>
+                    <TableCell className="hidden sm:table-cell">{format(new Date(sale.date), "PPP")}</TableCell>
+                    <TableCell className="sm:hidden table-cell">{format(new Date(sale.date), "MM/dd/yy")}</TableCell>
                     <TableCell>
                       {sale.items.map(item => {
                         const product = products.find(p => p.id === item.productId);

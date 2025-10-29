@@ -71,7 +71,7 @@ export default function SalesPage() {
             <CardContent>
             <div className="space-y-4">
                 {newSaleItems.map((item, index) => (
-                <div key={index} className="flex items-center gap-4">
+                <div key={index} className="flex items-center gap-2 sm:gap-4">
                     <Select
                     value={item.productId}
                     onValueChange={(value) => updateSaleItem(index, 'productId', value)}
@@ -92,7 +92,7 @@ export default function SalesPage() {
                     min="1"
                     value={item.quantity}
                     onChange={(e) => updateSaleItem(index, 'quantity', e.target.value)}
-                    className="w-24"
+                    className="w-20 sm:w-24"
                     />
                     <Button variant="ghost" size="icon" onClick={() => removeSaleItem(index)}>
                         <Trash2 className="h-4 w-4" />
@@ -103,9 +103,9 @@ export default function SalesPage() {
                 <PlusCircle className="mr-2 h-4 w-4" />
                 {t.addToSale}
                 </Button>
-                <div className="flex justify-end items-center pt-4 border-t">
-                    <span className="text-lg font-semibold mr-4">{t.total}: ₹{newSaleTotal.toFixed(2)}</span>
-                <Button>{t.submitSale}</Button>
+                <div className="flex flex-col sm:flex-row justify-end items-center pt-4 border-t gap-4">
+                    <span className="text-lg font-semibold">{t.total}: ₹{newSaleTotal.toFixed(2)}</span>
+                    <Button className="w-full sm:w-auto">{t.submitSale}</Button>
                 </div>
             </div>
             </CardContent>
