@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Plus, Minus, PlusCircle, Trash2, Camera } from "lucide-react";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { Plus, Minus, PlusCircle, Trash2, Camera, Check, ChevronsUpDown } from "lucide-react";
 import { Header } from "@/components/header";
 import {
   Card,
@@ -11,13 +11,6 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -31,7 +24,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+
 import { useProductStore } from "@/store/products";
+import { cn } from "@/lib/utils";
 
 const FAKE_BARCODE_SCANNER_DELAY = 1000;
 
@@ -46,6 +54,10 @@ export default function SalesPage() {
   const [isScannerOpen, setScannerOpen] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const sortedProducts = useMemo(() => 
+    [...products].sort((a, b) => a.name.localeCompare(b.name)),
+  [products]);
 
   useEffect(() => {
     if (isScannerOpen) {
@@ -83,7 +95,7 @@ export default function SalesPage() {
   
 
   const addSaleItem = (productId?: string) => {
-    const availableProducts = products.filter(
+    const availableProducts = sortedProducts.filter(
       p => !newSaleItems.some(item => item.productId === p.id) && p.stock > 0
     );
 
@@ -267,23 +279,53 @@ export default function SalesPage() {
             <div className="space-y-4">
                 {newSaleItems.map((item, index) => {
                   const product = products.find(p => p.id === item.productId);
+                  const [popoverOpen, setPopoverOpen] = useState(false);
                   return (
                     <div key={index} className="flex items-center gap-2 sm:gap-4">
-                      <Select
-                        value={item.productId}
-                        onValueChange={(value) => updateSaleItem(index, 'productId', value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a product" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {products.map((p) => (
-                            <SelectItem key={p.id} value={p.id} disabled={p.stock === 0 || (newSaleItems.some(i => i.productId === p.id) && item.productId !== p.id)}>
-                              {p.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                       <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={popoverOpen}
+                            className="w-[250px] justify-between"
+                          >
+                            {item.productId
+                              ? sortedProducts.find((p) => p.id === item.productId)?.name
+                              : "Select a product"}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[250px] p-0">
+                          <Command>
+                            <CommandInput placeholder="Search product..." />
+                            <CommandList>
+                              <CommandEmpty>No product found.</CommandEmpty>
+                              <CommandGroup>
+                                {sortedProducts.map((p) => (
+                                  <CommandItem
+                                    key={p.id}
+                                    value={p.name}
+                                    disabled={p.stock === 0 || (newSaleItems.some(i => i.productId === p.id) && item.productId !== p.id)}
+                                    onSelect={() => {
+                                      updateSaleItem(index, 'productId', p.id);
+                                      setPopoverOpen(false);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        item.productId === p.id ? "opacity-100" : "opacity-0"
+                                      )}
+                                    />
+                                    {p.name}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
 
                       <div className="flex items-center gap-1">
                         <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => updateSaleItem(index, 'quantity', item.quantity - 1)}>
