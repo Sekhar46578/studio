@@ -302,25 +302,30 @@ export default function SalesPage() {
                             <CommandList>
                               <CommandEmpty>No product found.</CommandEmpty>
                               <CommandGroup>
-                                {sortedProducts.map((p) => (
-                                  <CommandItem
-                                    key={p.id}
-                                    value={p.name}
-                                    disabled={p.stock === 0 || (newSaleItems.some(saleItem => saleItem.productId === p.id) && item.productId !== p.id)}
-                                    onSelect={() => {
-                                      updateSaleItem(index, 'productId', p.id);
-                                      setOpenPopoverIndex(null);
-                                    }}
-                                  >
-                                    <Check
-                                      className={cn(
-                                        "mr-2 h-4 w-4",
-                                        item.productId === p.id ? "opacity-100" : "opacity-0"
-                                      )}
-                                    />
-                                    {p.name}
-                                  </CommandItem>
-                                ))}
+                                {sortedProducts.map((p) => {
+                                  const isAlreadySelected = newSaleItems.some(
+                                    (saleItem) => saleItem.productId === p.id && item.productId !== p.id
+                                  );
+                                  return (
+                                    <CommandItem
+                                      key={p.id}
+                                      value={p.name}
+                                      disabled={p.stock === 0 || isAlreadySelected}
+                                      onSelect={() => {
+                                        updateSaleItem(index, 'productId', p.id);
+                                        setOpenPopoverIndex(null);
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          item.productId === p.id ? "opacity-100" : "opacity-0"
+                                        )}
+                                      />
+                                      {p.name}
+                                    </CommandItem>
+                                  );
+                                })}
                               </CommandGroup>
                             </CommandList>
                           </Command>
@@ -366,7 +371,3 @@ export default function SalesPage() {
     </div>
   );
 }
-
-    
-
-    
