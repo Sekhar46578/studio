@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Plus, Minus, PlusCircle, Trash2, Camera, Check, ChevronsUpDown } from "lucide-react";
 import { Header } from "@/components/header";
 import {
@@ -56,9 +56,6 @@ export default function SalesPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [openPopoverIndex, setOpenPopoverIndex] = useState<number | null>(null);
 
-  const sortedProducts = useMemo(() => 
-    [...products].sort((a, b) => a.name.localeCompare(b.name)),
-  [products]);
 
   useEffect(() => {
     if (isScannerOpen) {
@@ -96,7 +93,7 @@ export default function SalesPage() {
   
 
   const addSaleItem = (productId?: string) => {
-    const availableProducts = sortedProducts.filter(
+    const availableProducts = products.filter(
       p => !newSaleItems.some(item => item.productId === p.id) && p.stock > 0
     );
 
@@ -291,7 +288,7 @@ export default function SalesPage() {
                             className="w-[250px] justify-between"
                           >
                             {item.productId
-                              ? sortedProducts.find((p) => p.id === item.productId)?.name
+                              ? products.find((p) => p.id === item.productId)?.name
                               : "Select a product"}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
@@ -302,7 +299,7 @@ export default function SalesPage() {
                             <CommandList>
                               <CommandEmpty>No product found.</CommandEmpty>
                               <CommandGroup>
-                                {sortedProducts.map((p) => {
+                                {products.map((p) => {
                                   const isAlreadySelected = newSaleItems.some(
                                     (saleItem) => saleItem.productId === p.id && item.productId !== p.id
                                   );
@@ -371,5 +368,7 @@ export default function SalesPage() {
     </div>
   );
 }
+
+    
 
     
