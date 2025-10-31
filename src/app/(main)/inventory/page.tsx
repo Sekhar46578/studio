@@ -74,6 +74,7 @@ export default function InventoryPage() {
       category: formData.get("category") as string,
       barcode: formData.get("barcode") as string,
       imageUrl: `https://picsum.photos/seed/${Date.now()}/400/300`,
+      unit: formData.get("unit") as string,
     };
     addProduct(newProduct);
     setDialogOpen(false);
@@ -140,6 +141,10 @@ export default function InventoryPage() {
                           <Label htmlFor="barcode" className="text-right">Barcode</Label>
                           <Input id="barcode" name="barcode" className="col-span-3" />
                         </div>
+                         <div className="grid grid-cols-4 items-center gap-4">
+                          <Label htmlFor="unit" className="text-right">Unit</Label>
+                          <Input id="unit" name="unit" placeholder="e.g., kg, liter, piece" className="col-span-3" />
+                        </div>
                       </div>
                     </ScrollArea>
                     <DialogFooter>
@@ -179,7 +184,7 @@ export default function InventoryPage() {
                       />
                     </TableCell>
                     <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell>{product.stock}</TableCell>
+                    <TableCell>{product.stock} {product.unit}</TableCell>
                     <TableCell>{getStockStatus(product.stock, product.lowStockThreshold)}</TableCell>
                     <TableCell className="hidden md:table-cell">₹{product.price.toFixed(2)}</TableCell>
                     <TableCell>

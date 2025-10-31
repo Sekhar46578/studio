@@ -8,6 +8,7 @@ export type Product = {
   category: string;
   imageUrl: string;
   barcode?: string;
+  unit?: string;
 };
 
 export type SaleItem = {

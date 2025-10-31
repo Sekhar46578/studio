@@ -265,46 +265,50 @@ export default function SalesPage() {
             </CardHeader>
             <CardContent>
             <div className="space-y-4">
-                {newSaleItems.map((item, index) => (
-                <div key={index} className="flex items-center gap-2 sm:gap-4">
-                    <Select
-                    value={item.productId}
-                    onValueChange={(value) => updateSaleItem(index, 'productId', value)}
-                    >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select a product" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {products.map((product) => (
-                        <SelectItem key={product.id} value={product.id} disabled={product.stock === 0 || (newSaleItems.some(i => i.productId === product.id) && item.productId !== product.id)}>
-                            {product.name}
-                        </SelectItem>
-                        ))}
-                    </SelectContent>
-                    </Select>
+                {newSaleItems.map((item, index) => {
+                  const product = products.find(p => p.id === item.productId);
+                  return (
+                    <div key={index} className="flex items-center gap-2 sm:gap-4">
+                      <Select
+                        value={item.productId}
+                        onValueChange={(value) => updateSaleItem(index, 'productId', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a product" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {products.map((p) => (
+                            <SelectItem key={p.id} value={p.id} disabled={p.stock === 0 || (newSaleItems.some(i => i.productId === p.id) && item.productId !== p.id)}>
+                              {p.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
 
-                    <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1">
                         <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => updateSaleItem(index, 'quantity', item.quantity - 1)}>
-                            <Minus className="h-4 w-4" />
+                          <Minus className="h-4 w-4" />
                         </Button>
                         <Input
-                            type="number"
-                            min="1"
-                            value={item.quantity}
-                            onChange={(e) => updateSaleItem(index, 'quantity', e.target.value)}
-                            className="w-16 text-center"
+                          type="number"
+                          min="1"
+                          value={item.quantity}
+                          onChange={(e) => updateSaleItem(index, 'quantity', e.target.value)}
+                          className="w-16 text-center"
                         />
-                         <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => updateSaleItem(index, 'quantity', item.quantity + 1)}>
-                            <Plus className="h-4 w-4" />
+                        <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => updateSaleItem(index, 'quantity', item.quantity + 1)}>
+                          <Plus className="h-4 w-4" />
                         </Button>
-                    </div>
+                      </div>
 
-                     <span className="w-24 text-right">x ₹{item.priceAtSale.toFixed(2)}</span>
-                    <Button variant="ghost" size="icon" onClick={() => removeSaleItem(index)}>
+                      <span className="w-24 text-right">x ₹{item.priceAtSale.toFixed(2)}</span>
+                      {product?.unit && <span className="w-12 text-muted-foreground">{product.unit}</span>}
+                      <Button variant="ghost" size="icon" onClick={() => removeSaleItem(index)}>
                         <Trash2 className="h-4 w-4 text-red-500" />
-                    </Button>
-                </div>
-                ))}
+                      </Button>
+                    </div>
+                  );
+                })}
                 <Button variant="outline" onClick={() => addSaleItem()} className="w-full">
                 <PlusCircle className="mr-2 h-4 w-4" />
                 {t.addToSale}

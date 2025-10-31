@@ -12,6 +12,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: 'Grains',
     imageUrl: 'https://images.unsplash.com/photo-1627482265910-5c0ff6bee088?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8YmFnJTIwcmljZXxlbnwwfHx8fDE3NjE2NDc4MTZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
     barcode: '8901234567890',
+    unit: 'kg',
   },
   {
     id: 'prod_2',
@@ -23,6 +24,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: 'Lentils',
     imageUrl: 'https://images.unsplash.com/photo-1587041770006-965fc1251180?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxsZW50aWxzJTIwZGFsfGVufDB8fHx8MTc2MTY0NzgxN3ww&ixlib=rb-4.1.0&q=80&w=1080',
     barcode: '8902345678901',
+    unit: 'kg',
   },
   {
     id: 'prod_3',
@@ -34,6 +36,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: 'Flour',
     imageUrl: 'https://images.unsplash.com/photo-1710857389305-5cba9211033f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxmbG91ciUyMGJhZ3xlbnwwfHx8fDE3NjE1NzUxNTF8MA&ixlib=rb-4.1.0&q=80&w=1080',
     barcode: '8903456789012',
+    unit: 'kg',
   },
   {
     id: 'prod_4',
@@ -45,6 +48,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: 'Oils',
     imageUrl: 'https://images.unsplash.com/photo-1720468750623-39e9a09f5067?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjb29raW5nJTIwb2lsfGVufDB8fHx8MTc2MTY0NzgxNnww&ixlib=rb-4.1.0&q=80&w=1080',
     barcode: '8904567890123',
+    unit: 'liter',
   },
   {
     id: 'prod_5',
@@ -56,6 +60,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: 'Spices',
     imageUrl: 'https://images.unsplash.com/photo-1698943510650-9232c98a5328?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx0dXJtZXJpYyUyMHBvd2RlcnxlbnwwfHx8fDE3NjE2NDMxNzV8MA&ixlib=rb-4.1.0&q=80&w=1080',
     barcode: '8905678901234',
+    unit: 'grams',
   },
   {
     id: 'prod_6',
@@ -67,6 +72,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: 'Spices',
     imageUrl: 'https://images.unsplash.com/photo-1731970820339-e725b78f55e4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjdW1pbiUyMHNlZWRzfGVufDB8fHx8MTc2MTU1ODYxOHww&ixlib=rb-4.1.0&q=80&w=1080',
     barcode: '8906789012345',
+    unit: 'grams',
   },
   {
     id: 'prod_7',
@@ -78,6 +84,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: 'Sweeteners',
     imageUrl: 'https://images.unsplash.com/photo-1761426079132-c2c9978b9514?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxzdWdhciUyMHBhY2tldHxlbnwwfHx8fDE3NjE2NDc4MTZ8MA&ixlib=rb-4.1.0&q=80&w=1080',
     barcode: '8907890123456',
+    unit: 'kg',
   },
   {
     id: 'prod_8',
@@ -89,6 +96,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: 'Beverages',
     imageUrl: 'https://images.unsplash.com/photo-1597481288323-efff1b2f6d23?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx0ZWElMjBib3h8ZW58MHx8fHwxNzYxNTc1MTUxfDA&ixlib=rb-4.1.0&q=80&w=1080',
     barcode: '8908901234567',
+    unit: 'grams',
   },
   {
     id: 'prod_9',
@@ -100,6 +108,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: 'Dairy',
     imageUrl: 'https://images.unsplash.com/photo-1543463573-35e4afd0ab43?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxnaGVlJTIwamFyfGVufDB8fHx8MTc2MTU3NTE1MXww&ixlib=rb-4.1.0&q=80&w=1080',
     barcode: '8909012345678',
+    unit: 'ml',
   },
   {
     id: 'prod_10',
@@ -111,6 +120,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: 'Vegetables',
     imageUrl: 'https://images.unsplash.com/photo-1741517481122-51d958803203?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxmcmVzaCUyMG9uaW9uc3xlbnwwfHx8fDE3NjE1NTkyODd8MA&ixlib=rb-4.1.0&q=80&w=1080',
     barcode: '8900123456789',
+    unit: 'kg',
   },
   {
     id: 'prod_11',
@@ -122,6 +132,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: 'Vegetables',
     imageUrl: 'https://images.unsplash.com/photo-1594885270227-c61f9bc1383d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmcmVzaCUyMHBvdGF0b2VzfGVufDB8fHx8MTc2MTY0NzgxN3ww&ixlib=rb-4.1.0&q=80&w=1080',
     barcode: '8901122334455',
+    unit: 'kg',
   },
   {
     id: 'prod_12',
@@ -133,6 +144,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: 'Vegetables',
     imageUrl: 'https://images.unsplash.com/photo-1683009118690-a5851ccb1112?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxmcmVzaCUyMHRvbWF0b2VzfGVufDB8fHx8MTc2MTU5NDQ1MXww&ixlib=rb-4.1.0&q=80&w=1080',
     barcode: '8902233445566',
+    unit: 'kg',
   },
   {
     id: 'prod_13',
@@ -143,7 +155,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     lowStockThreshold: 50,
     category: 'Snacks',
     imageUrl: 'https://picsum.photos/seed/biscuit/400/300',
-    barcode: '8901234567891'
+    barcode: '8901234567891',
+    unit: 'pack',
   },
   {
     id: 'prod_14',
@@ -154,7 +167,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     lowStockThreshold: 40,
     category: 'Snacks',
     imageUrl: 'https://picsum.photos/seed/chips/400/300',
-    barcode: '8901234567892'
+    barcode: '8901234567892',
+    unit: 'pack',
   },
   {
     id: 'prod_15',
@@ -165,7 +179,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     lowStockThreshold: 25,
     category: 'Beverages',
     imageUrl: 'https://picsum.photos/seed/cola/400/300',
-    barcode: '8901234567893'
+    barcode: '8901234567893',
+    unit: 'bottle',
   },
   {
     id: 'prod_16',
@@ -176,7 +191,8 @@ export const INITIAL_PRODUCTS: Product[] = [
     lowStockThreshold: 60,
     category: 'Chocolates',
     imageUrl: 'https://picsum.photos/seed/chocolate/400/300',
-    barcode: '8901234567894'
+    barcode: '8901234567894',
+    unit: 'piece',
   }
 ];
 
