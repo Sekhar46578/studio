@@ -83,9 +83,14 @@ export default function SalesPage() {
   
 
   const addSaleItem = (productId?: string) => {
-    const productToAdd = productId 
+    const availableProducts = products.filter(
+      p => !newSaleItems.some(item => item.productId === p.id) && p.stock > 0
+    );
+
+    const productToAdd = productId
       ? products.find(p => p.id === productId)
-      : products.length > 0 ? products[0] : undefined;
+      : availableProducts.length > 0 ? availableProducts[0] : undefined;
+
 
     if (productToAdd) {
         if(productToAdd.stock === 0) {
@@ -115,6 +120,12 @@ export default function SalesPage() {
                 { productId: productToAdd.id, quantity: 1, priceAtSale: productToAdd.price },
             ]);
         }
+    } else if (!productId) {
+      toast({
+        variant: "destructive",
+        title: "No more products to add",
+        description: "You have added all available products.",
+      });
     }
   };
 
@@ -265,7 +276,7 @@ export default function SalesPage() {
                     </SelectTrigger>
                     <SelectContent>
                         {products.map((product) => (
-                        <SelectItem key={product.id} value={product.id} disabled={product.stock === 0}>
+                        <SelectItem key={product.id} value={product.id} disabled={product.stock === 0 || (newSaleItems.some(i => i.productId === product.id) && i.productId !== item.productId)}>
                             {product.name}
                         </SelectItem>
                         ))}
@@ -309,3 +320,5 @@ export default function SalesPage() {
     </div>
   );
 }
+
+    
