@@ -54,6 +54,7 @@ export default function SalesPage() {
   const [isScannerOpen, setScannerOpen] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [openPopoverIndex, setOpenPopoverIndex] = useState<number | null>(null);
 
   const sortedProducts = useMemo(() => 
     [...products].sort((a, b) => a.name.localeCompare(b.name)),
@@ -279,15 +280,14 @@ export default function SalesPage() {
             <div className="space-y-4">
                 {newSaleItems.map((item, index) => {
                   const product = products.find(p => p.id === item.productId);
-                  const [popoverOpen, setPopoverOpen] = useState(false);
                   return (
                     <div key={index} className="flex items-center gap-2 sm:gap-4">
-                       <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                       <Popover open={openPopoverIndex === index} onOpenChange={(isOpen) => setOpenPopoverIndex(isOpen ? index : null)}>
                         <PopoverTrigger asChild>
                           <Button
                             variant="outline"
                             role="combobox"
-                            aria-expanded={popoverOpen}
+                            aria-expanded={openPopoverIndex === index}
                             className="w-[250px] justify-between"
                           >
                             {item.productId
@@ -306,10 +306,10 @@ export default function SalesPage() {
                                   <CommandItem
                                     key={p.id}
                                     value={p.name}
-                                    disabled={p.stock === 0 || (newSaleItems.some(i => i.productId === p.id) && item.productId !== p.id)}
+                                    disabled={p.stock === 0 || (newSaleItems.some(i => i.productId === p.id) && i.productId !== item.productId)}
                                     onSelect={() => {
                                       updateSaleItem(index, 'productId', p.id);
-                                      setPopoverOpen(false);
+                                      setOpenPopoverIndex(null);
                                     }}
                                   >
                                     <Check
