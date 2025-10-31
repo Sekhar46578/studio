@@ -21,7 +21,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { MOCK_SALES } from "@/lib/constants";
 import type { Sale, SaleItem } from "@/lib/types";
 import { useTranslation } from "@/lib/hooks/use-translation";
 import { useToast } from "@/hooks/use-toast";
@@ -40,6 +39,7 @@ export default function SalesPage() {
   const { t } = useTranslation();
   const products = useProductStore((state) => state.products);
   const decreaseStock = useProductStore((state) => state.decreaseStock);
+  const addSale = useProductStore((state) => state.addSale);
   const [newSaleItems, setNewSaleItems] = useState<SaleItem[]>([]);
   const { toast } = useToast();
   
@@ -211,7 +211,7 @@ export default function SalesPage() {
         decreaseStock(item.productId, item.quantity);
     });
 
-    MOCK_SALES.unshift(newSale);
+    addSale(newSale);
     
     toast({
       title: "Sale Recorded!",

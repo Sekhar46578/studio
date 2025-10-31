@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -27,8 +28,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { INITIAL_PRODUCTS, MOCK_SALES } from "@/lib/constants";
-import type { Product, Sale } from "@/lib/types";
 import { useTranslation } from "@/lib/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { useProductStore } from "@/store/products";
@@ -36,7 +35,7 @@ import { useProductStore } from "@/store/products";
 export default function HistoryPage() {
   const { t } = useTranslation();
   const products = useProductStore((state) => state.products);
-  const [sales] = useState<Sale[]>(MOCK_SALES);
+  const sales = useProductStore((state) => state.sales);
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
     to: new Date(),

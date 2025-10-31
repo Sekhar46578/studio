@@ -1,8 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
-import { TrendingUp, TrendingDown, Crown } from "lucide-react";
+import { TrendingDown, Crown } from "lucide-react";
 import { Header } from "@/components/header";
 import {
   Card,
@@ -11,8 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { MOCK_SALES } from "@/lib/constants";
-import type { Sale } from "@/lib/types";
 import { useTranslation } from "@/lib/hooks/use-translation";
 import {
   Table,
@@ -37,7 +34,7 @@ import {
 export default function DashboardPage() {
   const { t } = useTranslation();
   const products = useProductStore((state) => state.products);
-  const [sales] = useState<Sale[]>(MOCK_SALES);
+  const sales = useProductStore((state) => state.sales);
   
   const today = new Date();
   today.setHours(0, 0, 0, 0);

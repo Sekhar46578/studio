@@ -13,25 +13,26 @@ import {
 } from "@/components/ui/card";
 import { useTranslation } from "@/lib/hooks/use-translation";
 import { analyzeSalesTrends, type AnalyzeSalesTrendsOutput } from "@/ai/flows/analyze-sales-trends";
-import { INITIAL_PRODUCTS, MOCK_SALES } from "@/lib/constants";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
+import { useProductStore } from "@/store/products";
 
 export default function TrendsPage() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState<AnalyzeSalesTrendsOutput | null>(null);
+  const { products, sales } = useProductStore();
 
   const handleAnalyze = async () => {
     setLoading(true);
     setError(null);
     setAnalysisResult(null);
     try {
-      const salesHistory = JSON.stringify(MOCK_SALES);
+      const salesHistory = JSON.stringify(sales);
       const currentStockLevels = JSON.stringify(
-        INITIAL_PRODUCTS.map(p => ({ name: p.name, stock: p.stock }))
+        products.map(p => ({ name: p.name, stock: p.stock }))
       );
 
       const result = await analyzeSalesTrends({ salesHistory, currentStockLevels });
