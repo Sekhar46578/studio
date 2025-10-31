@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { AlertTriangle, TrendingUp } from "lucide-react";
+import { TrendingUp } from "lucide-react";
 import { Header } from "@/components/header";
 import {
   Card,
@@ -15,9 +15,6 @@ import { Button } from "@/components/ui/button";
 import { MOCK_SALES } from "@/lib/constants";
 import type { Sale } from "@/lib/types";
 import { useTranslation } from "@/lib/hooks/use-translation";
-import { analyzeSalesTrends, type AnalyzeSalesTrendsOutput } from "@/ai/flows/analyze-sales-trends";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Table,
   TableBody,
@@ -27,53 +24,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useProductStore } from "@/store/products";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const { t } = useTranslation();
   const products = useProductStore((state) => state.products);
   const [sales] = useState<Sale[]>(MOCK_SALES);
   
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [analysisResult, setAnalysisResult] = useState<AnalyzeSalesTrendsOutput | null>(null);
-
-  const handleAnalyze = async () => {
-    setLoading(true);
-    setError(null);
-    setAnalysisResult(null);
-    try {
-      const salesHistory = JSON.stringify(MOCK_SALES);
-      const currentStockLevels = JSON.stringify(
-        products.map(p => ({ name: p.name, stock: p.stock }))
-      );
-
-      const result = await analyzeSalesTrends({ salesHistory, currentStockLevels });
-      setAnalysisResult(result);
-    } catch (e) {
-      console.error(e);
-      setError(t.analysisError);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  const AnalysisSkeleton = () => (
-    <div className="grid gap-6 mt-6 md:grid-cols-2">
-      {[...Array(2)].map((_, i) => (
-        <Card key={i}>
-          <CardHeader>
-            <Skeleton className="h-6 w-1/2" />
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-3/4" />
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
-
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -99,33 +56,18 @@ export default function DashboardPage() {
                     Get advice on how to improve your sales and manage stock.
                   </CardDescription>
                 </div>
-                <Button onClick={handleAnalyze} disabled={loading} className="w-full sm:w-auto">
-                  <TrendingUp className="mr-2 h-4 w-4" />
-                  {loading ? t.analyzing : t.analyzeTrends}
+                <Button asChild className="w-full sm:w-auto">
+                    <Link href="/trends">
+                        <TrendingUp className="mr-2 h-4 w-4" />
+                        {t.analyzeTrends}
+                    </Link>
                 </Button>
               </div>
             </CardHeader>
             <CardContent>
-              {error && (
-                <Alert variant="destructive">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-              {loading && <AnalysisSkeleton />}
-              {analysisResult && (
-                <div className="grid gap-6 mt-6 md:grid-cols-1 lg:grid-cols-2">
-                  <Card>
-                    <CardHeader><CardTitle>{t.trendSummary}</CardTitle></CardHeader>
-                    <CardContent><p>{analysisResult.trendSummary}</p></CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader><CardTitle>{t.stockRecommendations}</CardTitle></CardHeader>
-                    <CardContent><p className="whitespace-pre-line">{analysisResult.stockLevelRecommendations}</p></CardContent>
-                  </Card>
-                </div>
-              )}
+                <p className="text-sm text-muted-foreground">
+                    Click the &quot;{t.analyzeTrends}&quot; button to get a detailed analysis of your sales trends, stock recommendations, and more on the Trends page.
+                </p>
             </CardContent>
           </Card>
         </div>
@@ -133,7 +75,7 @@ export default function DashboardPage() {
         <div className="lg:col-span-2">
             <Card>
                 <CardHeader>
-                    <CardTitle>Today's Sales</CardTitle>
+                    <CardTitle>Today&apos;s Sales</CardTitle>
                     <CardDescription>
                         A summary of sales made today. Total: ₹{todaysTotal.toFixed(2)}
                     </CardDescription>
