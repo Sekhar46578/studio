@@ -276,7 +276,7 @@ export default function SalesPage() {
                     </SelectTrigger>
                     <SelectContent>
                         {products.map((product) => (
-                        <SelectItem key={product.id} value={product.id} disabled={product.stock === 0 || (newSaleItems.some(i => i.productId === product.id) && i.productId !== item.productId)}>
+                        <SelectItem key={product.id} value={product.id} disabled={product.stock === 0 || (newSaleItems.some(i => i.productId === product.id) && item.productId !== product.id)}>
                             {product.name}
                         </SelectItem>
                         ))}
