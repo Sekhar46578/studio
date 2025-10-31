@@ -306,7 +306,7 @@ export default function SalesPage() {
                                   <CommandItem
                                     key={p.id}
                                     value={p.name}
-                                    disabled={p.stock === 0 || (newSaleItems.some(i => i.productId === p.id) && i.productId !== item.productId)}
+                                    disabled={p.stock === 0 || (newSaleItems.some(saleItem => saleItem.productId === p.id) && item.productId !== p.id)}
                                     onSelect={() => {
                                       updateSaleItem(index, 'productId', p.id);
                                       setOpenPopoverIndex(null);
@@ -366,3 +366,5 @@ export default function SalesPage() {
     </div>
   );
 }
+
+    
