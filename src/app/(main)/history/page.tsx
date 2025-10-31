@@ -31,10 +31,11 @@ import { INITIAL_PRODUCTS, MOCK_SALES } from "@/lib/constants";
 import type { Product, Sale } from "@/lib/types";
 import { useTranslation } from "@/lib/hooks/use-translation";
 import { cn } from "@/lib/utils";
+import { useProductStore } from "@/store/products";
 
 export default function HistoryPage() {
   const { t } = useTranslation();
-  const [products] = useState<Product[]>(INITIAL_PRODUCTS);
+  const products = useProductStore((state) => state.products);
   const [sales] = useState<Sale[]>(MOCK_SALES);
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
@@ -115,7 +116,7 @@ export default function HistoryPage() {
                     <TableCell>
                       {sale.items.map(item => {
                         const product = products.find(p => p.id === item.productId);
-                        return <div key={item.productId}>{product?.name || 'Unknown'} x {item.quantity}</div>
+                        return <div key={item.productId}>{product?.name || 'Unknown'} x {item.quantity} {product?.unit}</div>
                       })}
                     </TableCell>
                     <TableCell className="text-right">₹{sale.total.toFixed(2)}</TableCell>

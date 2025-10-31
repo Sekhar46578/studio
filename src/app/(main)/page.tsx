@@ -153,7 +153,7 @@ export default function DashboardPage() {
                                     <TableCell>
                                     {sale.items.map(item => {
                                         const product = products.find(p => p.id === item.productId);
-                                        return <div key={item.productId}>{product?.name || 'Unknown'} x {item.quantity}</div>
+                                        return <div key={item.productId}>{product?.name || 'Unknown'} x {item.quantity} {product?.unit}</div>
                                     })}
                                     </TableCell>
                                     <TableCell className="text-right">₹{sale.total.toFixed(2)}</TableCell>
