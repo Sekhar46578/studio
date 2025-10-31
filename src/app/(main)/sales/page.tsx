@@ -40,6 +40,7 @@ import {
 
 import { useProductStore } from "@/store/products";
 import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const FAKE_BARCODE_SCANNER_DELAY = 1000;
 
@@ -294,38 +295,38 @@ export default function SalesPage() {
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-[250px] p-0">
-                          <Command>
-                            <CommandInput placeholder="Search product..." />
-                            <CommandList>
-                              <CommandEmpty>No product found.</CommandEmpty>
-                              <CommandGroup>
-                                {products.map((p) => {
-                                  const isAlreadySelected = newSaleItems.some(
-                                    (saleItem) => saleItem.productId === p.id && item.productId !== p.id
-                                  );
-                                  return (
-                                    <CommandItem
-                                      key={p.id}
-                                      value={p.id}
-                                      disabled={p.stock === 0 || isAlreadySelected}
-                                      onSelect={(currentValue) => {
-                                        updateSaleItem(index, 'productId', currentValue);
-                                        setOpenPopoverIndex(null);
-                                      }}
-                                    >
-                                      <Check
-                                        className={cn(
-                                          "mr-2 h-4 w-4",
-                                          item.productId === p.id ? "opacity-100" : "opacity-0"
-                                        )}
-                                      />
-                                      {p.name}
-                                    </CommandItem>
-                                  );
-                                })}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
+                          <ScrollArea className="h-72">
+                            <div className="p-1">
+                            {products.map((p) => {
+                              const isAlreadySelected = newSaleItems.some(
+                                (saleItem) => saleItem.productId === p.id && item.productId !== p.id
+                              );
+                              return (
+                                <Button
+                                  variant="ghost"
+                                  className={cn(
+                                    "w-full justify-start",
+                                    item.productId === p.id && "bg-accent"
+                                  )}
+                                  key={p.id}
+                                  disabled={p.stock === 0 || isAlreadySelected}
+                                  onClick={() => {
+                                    updateSaleItem(index, 'productId', p.id);
+                                    setOpenPopoverIndex(null);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      item.productId === p.id ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {p.name}
+                                </Button>
+                              );
+                            })}
+                            </div>
+                          </ScrollArea>
                         </PopoverContent>
                       </Popover>
 
@@ -368,7 +369,3 @@ export default function SalesPage() {
     </div>
   );
 }
-
-    
-
-    
