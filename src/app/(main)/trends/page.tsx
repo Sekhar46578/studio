@@ -1,9 +1,9 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, DollarSign, ShoppingCart, TrendingDown, Crown } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
@@ -21,68 +21,97 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useTranslation } from "@/lib/hooks/use-translation";
-import { analyzeSalesTrends, type AnalyzeSalesTrendsOutput } from "@/ai/flows/analyze-sales-trends";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle } from "lucide-react";
 import { useProductStore } from "@/store/products";
 import { cn } from "@/lib/utils";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import { isWithinInterval, startOfDay } from "date-fns";
 
 export default function TrendsPage() {
   const { t } = useTranslation();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [analysisResult, setAnalysisResult] = useState<AnalyzeSalesTrendsOutput | null>(null);
   const { products, sales } = useProductStore();
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
     to: new Date(),
   });
 
-  const handleAnalyze = async () => {
-    setLoading(true);
-    setError(null);
-    setAnalysisResult(null);
-    try {
-      const filteredSales = sales.filter(sale => {
-        const saleDate = new Date(sale.date);
-        if (date?.from && date?.to) {
-          return saleDate >= date.from && saleDate <= date.to;
-        }
-        return true;
-      });
+  const filteredSales = useMemo(() => {
+    return sales.filter(sale => {
+      const saleDate = new Date(sale.date);
+      if (date?.from && date?.to) {
+        const from = startOfDay(date.from);
+        const to = startOfDay(date.to);
+        return isWithinInterval(saleDate, { start: from, end: to });
+      }
+      return true;
+    });
+  }, [sales, date]);
 
-      const salesHistory = JSON.stringify(filteredSales);
-      const currentStockLevels = JSON.stringify(
-        products.map(p => ({ name: p.name, stock: p.stock }))
-      );
-
-      const result = await analyzeSalesTrends({ salesHistory, currentStockLevels });
-      setAnalysisResult(result);
-    } catch (e) {
-      console.error(e);
-      setError(t.analysisError);
-    } finally {
-      setLoading(false);
+  const analysis = useMemo(() => {
+    if (filteredSales.length === 0) {
+      return {
+        totalRevenue: 0,
+        totalSales: 0,
+        productPerformance: [],
+        salesOverTime: [],
+      };
     }
-  };
 
-  const AnalysisSkeleton = () => (
-    <div className="grid gap-6 mt-6 md:grid-cols-2">
-      {[...Array(5)].map((_, i) => (
-        <Card key={i}>
-          <CardHeader>
-            <Skeleton className="h-6 w-1/2" />
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-3/4" />
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
+    const totalRevenue = filteredSales.reduce((acc, sale) => acc + sale.total, 0);
+    const totalSales = filteredSales.length;
+
+    const productSales: { [key: string]: { name: string; quantity: number; unit: string | undefined } } = {};
+    products.forEach(p => {
+        productSales[p.id] = { name: p.name, quantity: 0, unit: p.unit };
+    });
+
+    filteredSales.forEach(sale => {
+      sale.items.forEach(item => {
+        if (productSales[item.productId]) {
+          productSales[item.productId].quantity += item.quantity;
+        }
+      });
+    });
+
+    const productPerformance = Object.values(productSales)
+      .filter(p => p.quantity > 0)
+      .sort((a, b) => b.quantity - a.quantity);
+      
+    const salesByDate: { [key: string]: number } = {};
+    filteredSales.forEach(sale => {
+      const day = format(new Date(sale.date), 'MMM dd');
+      if (!salesByDate[day]) {
+        salesByDate[day] = 0;
+      }
+      salesByDate[day] += sale.total;
+    });
+    
+    const salesOverTime = Object.keys(salesByDate).map(date => ({
+        date,
+        total: salesByDate[date],
+    })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+
+    return {
+      totalRevenue,
+      totalSales,
+      productPerformance,
+      salesOverTime
+    };
+
+  }, [filteredSales, products]);
+
+  const bestSelling = analysis.productPerformance[0];
+  const worstSelling = analysis.productPerformance.length > 1 ? analysis.productPerformance[analysis.productPerformance.length - 1] : null;
+
 
   return (
     <div className="flex min-h-screen w-full flex-col">
@@ -94,7 +123,7 @@ export default function TrendsPage() {
               <div className="mb-4 sm:mb-0">
                 <CardTitle>{t.salesTrendAnalysis}</CardTitle>
                 <CardDescription>
-                  Get advice on how to improve your sales and manage stock.
+                  Review your sales performance over a selected period.
                 </CardDescription>
               </div>
               <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -134,49 +163,111 @@ export default function TrendsPage() {
                     />
                   </PopoverContent>
                 </Popover>
-                <Button onClick={handleAnalyze} disabled={loading} className="w-full sm:w-auto">
-                  {loading ? t.analyzing : t.analyzeTrends}
-                </Button>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            {error && (
-              <Alert variant="destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            {loading && <AnalysisSkeleton />}
-            {analysisResult && (
-              <div className="grid gap-6 mt-6 md:grid-cols-1 lg:grid-cols-2">
-                <Card>
-                  <CardHeader><CardTitle>{t.trendSummary}</CardTitle></CardHeader>
-                  <CardContent><p>{analysisResult.trendSummary}</p></CardContent>
-                </Card>
-                <Card>
-                  <CardHeader><CardTitle>{t.stockRecommendations}</CardTitle></CardHeader>
-                  <CardContent><p className="whitespace-pre-line">{analysisResult.stockLevelRecommendations}</p></CardContent>
-                </Card>
-                <Card>
-                  <CardHeader><CardTitle>{t.pricingRecommendations}</CardTitle></CardHeader>
-                  <CardContent><p className="whitespace-pre-line">{analysisResult.pricingRecommendations}</p></CardContent>
-                </Card>
-                <Card>
-                  <CardHeader><CardTitle>{t.orderingPlanModifications}</CardTitle></CardHeader>
-                  <CardContent><p className="whitespace-pre-line">{analysisResult.orderingPlanModifications}</p></CardContent>
-                </Card>
-                 <Card className="lg:col-span-2">
-                  <CardHeader><CardTitle>{t.additionalInsights}</CardTitle></CardHeader>
-                  <CardContent><p>{analysisResult.additionalInsights}</p></CardContent>
-                </Card>
-              </div>
-            )}
-             {!loading && !analysisResult && !error && (
-              <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-48">
-                <p>Select a date range and click "Analyze Sales" to see your trends.</p>
-              </div>
+            {filteredSales.length === 0 ? (
+                 <div className="flex flex-col items-center justify-center text-center text-muted-foreground h-48">
+                    <p>No sales data for the selected period.</p>
+                </div>
+            ) : (
+                <div className="grid gap-6 mt-6 md:grid-cols-2 lg:grid-cols-4">
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                            <DollarSign className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">₹{analysis.totalRevenue.toFixed(2)}</div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Sales</CardTitle>
+                            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">+{analysis.totalSales}</div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Best Seller</CardTitle>
+                            <Crown className="h-4 w-4 text-muted-foreground text-yellow-500" />
+                        </CardHeader>
+                        <CardContent>
+                            {bestSelling ? (
+                                <>
+                                 <div className="text-2xl font-bold">{bestSelling.name}</div>
+                                 <p className="text-xs text-muted-foreground">
+                                    {bestSelling.quantity} {bestSelling.unit} sold
+                                 </p>
+                                </>
+                            ) : <p>N/A</p>}
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Worst Seller</CardTitle>
+                             <TrendingDown className="h-4 w-4 text-muted-foreground" />
+                        </CardHeader>
+                        <CardContent>
+                            {worstSelling ? (
+                                <>
+                                 <div className="text-2xl font-bold">{worstSelling.name}</div>
+                                  <p className="text-xs text-muted-foreground">
+                                    {worstSelling.quantity} {worstSelling.unit} sold
+                                 </p>
+                                </>
+                            ) : <p>N/A</p>}
+                        </CardContent>
+                    </Card>
+
+                    <Card className="md:col-span-2 lg:col-span-4">
+                        <CardHeader>
+                            <CardTitle>Sales Over Time</CardTitle>
+                        </CardHeader>
+                        <CardContent className="h-[300px]">
+                           <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={analysis.salesOverTime} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="date" />
+                                <YAxis />
+                                <Tooltip
+                                    content={({ active, payload, label }) =>
+                                    active && payload && payload.length ? (
+                                        <div className="rounded-lg border bg-background p-2 shadow-sm">
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div className="flex flex-col">
+                                            <span className="text-[0.70rem] uppercase text-muted-foreground">
+                                                Date
+                                            </span>
+                                            <span className="font-bold text-muted-foreground">
+                                                {label}
+                                            </span>
+                                            </div>
+                                            <div className="flex flex-col">
+                                            <span className="text-[0.70rem] uppercase text-muted-foreground">
+                                                Total
+                                            </span>
+                                            <span className="font-bold">
+                                                ₹{payload[0].value?.toFixed(2)}
+                                            </span>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    ) : null
+                                    }
+                                />
+                                <Legend />
+                                <Line type="monotone" dataKey="total" stroke="hsl(var(--primary))" activeDot={{ r: 8 }} />
+                            </LineChart>
+                            </ResponsiveContainer>
+                        </CardContent>
+                    </Card>
+
+                </div>
             )}
           </CardContent>
         </Card>
