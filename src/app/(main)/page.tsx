@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { TrendingDown, Crown, BarChart2 } from "lucide-react";
 import { Header } from "@/components/header";
 import {
@@ -74,25 +74,25 @@ export default function DashboardPage() {
     }
   };
 
-  const salesInInterval = sales.filter(sale => 
+  const salesInInterval = useMemo(() => sales.filter(sale => 
     isWithinInterval(new Date(sale.date), getInterval(timeRange))
-  );
+  ), [sales, timeRange]);
 
-  const productSales = products.map(product => {
+  const productSales = useMemo(() => products.map(product => {
     const totalSold = salesInInterval.reduce((acc, sale) => {
       const item = sale.items.find(item => item.productId === product.id);
       return acc + (item ? item.quantity : 0);
     }, 0);
     return { name: product.name, sold: totalSold, unit: product.unit };
-  }).sort((a, b) => b.sold - a.sold);
+  }).sort((a, b) => b.sold - a.sold), [products, salesInInterval]);
   
-  const allTimeProductSales = products.map(product => {
+  const allTimeProductSales = useMemo(() => products.map(product => {
     const totalSold = sales.reduce((acc, sale) => {
       const item = sale.items.find(item => item.productId === product.id);
       return acc + (item ? item.quantity : 0);
     }, 0);
     return { name: product.name, sold: totalSold, unit: product.unit };
-  }).sort((a, b) => b.sold - a.sold);
+  }).sort((a, b) => b.sold - a.sold), [products, sales]);
 
 
   const bestSelling = allTimeProductSales[0];
