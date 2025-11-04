@@ -82,7 +82,6 @@ export default function DashboardPage() {
 
   const quickActions = [
     { label: t.recordSale, href: "/sales", icon: PlusCircle },
-    { label: t.addNewProduct, href: "/inventory", icon: Package },
     { label: t.inventory, href: "/inventory", icon: Archive },
     { label: "Generate Report", href: "/trends", icon: FileText },
   ];
