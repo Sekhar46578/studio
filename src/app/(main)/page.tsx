@@ -3,19 +3,15 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { isToday, isWithinInterval, subDays, format } from "date-fns";
+import { isToday, format, subDays } from "date-fns";
 import {
-  DollarSign,
-  ShoppingCart,
-  Package,
-  ArrowRight,
   PlusCircle,
   Archive,
-  BarChart,
   FileText,
   AlertTriangle,
+  ArrowRight,
   Wifi,
-  Star,
+  Star
 } from "lucide-react";
 import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
@@ -62,7 +58,7 @@ export default function DashboardPage() {
   }, [sales, products]);
 
   const quickStats = useMemo(() => {
-    const lowStockCount = products.filter(p => p.stock > 0 && p.stock < p.lowStockThreshold).length;
+    const lowStockCount = products.filter(p => p.stock <= p.lowStockThreshold).length;
     return { lowStockCount };
   }, [products]);
 
@@ -192,7 +188,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {quickActions.map((action) => (
-                        <Button key={action.href} asChild variant="outline" className="h-20 flex-col gap-2">
+                        <Button key={action.label} asChild variant="outline" className="h-20 flex-col gap-2">
                              <Link href={action.href}>
                                 <action.icon className="h-6 w-6 text-primary" />
                                 <span>{action.label}</span>
