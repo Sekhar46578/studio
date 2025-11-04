@@ -11,6 +11,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import {marked} from 'marked';
+import {googleAI} from '@genkit-ai/google-genai';
 
 const MarketTrendsInputSchema = z.object({
   query: z.string().describe('The user\'s query about market trends.'),
@@ -41,6 +42,7 @@ const prompt = ai.definePrompt({
   name: 'marketTrendsPrompt',
   input: {schema: MarketTrendsInputSchema},
   output: {schema: MarketTrendsOutputSchema},
+  model: googleAI('gemini-1.5-flash-latest'),
   prompt: `You are a market analyst expert for small to medium-sized retail businesses in India.
   Your goal is to provide a concise, insightful, and easy-to-understand analysis of market trends based on the user's query.
 
