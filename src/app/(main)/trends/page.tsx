@@ -1,8 +1,9 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Package, TrendingUp, PieChart, AlertTriangle } from "lucide-react";
+import { Calendar as CalendarIcon, Package, TrendingUp, AlertTriangle } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
@@ -40,9 +41,6 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  Pie,
-  Cell,
-  Legend,
 } from "recharts";
 import { isWithinInterval, startOfDay } from "date-fns";
 
@@ -92,31 +90,15 @@ export default function TrendsPage() {
       .sort((a, b) => b.quantity - a.quantity)
       .slice(0, 5);
 
-    const revenueByCategory = filteredSales.reduce((acc, sale) => {
-        sale.items.forEach(item => {
-            const product = products.find(p => p.id === item.productId);
-            if(product) {
-                if(!acc[product.category]){
-                    acc[product.category] = 0;
-                }
-                acc[product.category] += item.priceAtSale * item.quantity;
-            }
-        });
-        return acc;
-    }, {} as Record<string, number>);
-
     const lowStockProducts = products.filter(p => p.stock < p.lowStockThreshold);
 
     return {
       salesOverTime: Object.entries(salesOverTime).map(([date, total]) => ({ date, total })).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
       top5Products,
-      revenueByCategory: Object.entries(revenueByCategory).map(([name, value]) => ({ name, value })),
       lowStockProducts,
     };
   }, [filteredSales, products]);
   
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF"];
-
   return (
     <div className="flex min-h-screen w-full flex-col">
       <Header title={t.trends} />
@@ -193,25 +175,7 @@ export default function TrendsPage() {
                     </ResponsiveContainer>
                 </CardContent>
             </Card>
-             <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><PieChart className="h-5 w-5"/>Revenue by Category</CardTitle>
-                </CardHeader>
-                <CardContent className="h-[300px]">
-                     <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie data={analysis.revenueByCategory} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
-                                 {analysis.revenueByCategory.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <Tooltip />
-                            <Legend />
-                        </PieChart>
-                    </ResponsiveContainer>
-                </CardContent>
-            </Card>
-            <Card>
+            <Card className="md:col-span-2">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2"><AlertTriangle className="h-5 w-5 text-yellow-500"/>Low Stock Alerts</CardTitle>
                 </CardHeader>
