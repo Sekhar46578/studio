@@ -9,6 +9,7 @@ interface AppState {
   products: Product[];
   sales: Sale[];
   addProduct: (product: Product) => void;
+  updateProduct: (product: Product) => void;
   decreaseStock: (productId: string, quantity: number) => void;
   addSale: (sale: Sale) => void;
 }
@@ -17,6 +18,9 @@ const createAppStore = () => create<AppState>((set) => ({
   products: INITIAL_PRODUCTS,
   sales: MOCK_SALES,
   addProduct: (product) => set((state) => ({ products: [product, ...state.products] })),
+  updateProduct: (product) => set((state) => ({
+    products: state.products.map((p) => (p.id === product.id ? product : p)),
+  })),
   decreaseStock: (productId, quantity) =>
     set((state) => ({
       products: state.products.map((p) =>
@@ -49,3 +53,5 @@ const useAppStore = <T,>(selector: (state: AppState) => T): T => {
 };
 
 export { createAppStore as createProductStore, AppStoreProvider as ProductStoreProvider, useAppStore as useProductStore };
+
+    

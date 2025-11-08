@@ -49,7 +49,11 @@ export default function InventoryPage() {
   const { t } = useTranslation();
   const products = useProductStore((state) => state.products);
   const addProduct = useProductStore((state) => state.addProduct);
-  const [isDialogOpen, setDialogOpen] = useState(false);
+  const updateProduct = useProductStore((state) => state.updateProduct);
+
+  const [isAddDialogOpen, setAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const getStockStatus = (stock: number, lowStockThreshold: number) => {
     if (stock === 0) {
@@ -76,7 +80,23 @@ export default function InventoryPage() {
       unit: formData.get("unit") as string,
     };
     addProduct(newProduct);
-    setDialogOpen(false);
+    setAddDialogOpen(false);
+  };
+  
+  const handleEditProduct = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!editingProduct) return;
+
+    const formData = new FormData(event.currentTarget);
+    const updatedProduct: Product = {
+      ...editingProduct,
+      name: formData.get("name") as string,
+      price: Number(formData.get("price")),
+      stock: Number(formData.get("stock")),
+    };
+    updateProduct(updatedProduct);
+    setEditDialogOpen(false);
+    setEditingProduct(null);
   };
 
 
@@ -93,7 +113,7 @@ export default function InventoryPage() {
                   Monitor and manage your product stock levels.
                 </CardDescription>
               </div>
-              <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
+              <Dialog open={isAddDialogOpen} onOpenChange={setAddDialogOpen}>
                 <DialogTrigger asChild>
                   <Button size="sm" className="gap-1">
                     <PlusCircle className="h-3.5 w-3.5" />
@@ -143,7 +163,7 @@ export default function InventoryPage() {
                       </div>
                     </ScrollArea>
                     <DialogFooter>
-                      <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>{t.cancel}</Button>
+                      <Button type="button" variant="outline" onClick={() => setAddDialogOpen(false)}>{t.cancel}</Button>
                       <Button type="submit">{t.save}</Button>
                     </DialogFooter>
                   </form>
@@ -192,7 +212,7 @@ export default function InventoryPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => { setEditingProduct(product); setEditDialogOpen(true); }}>Edit</DropdownMenuItem>
                           <DropdownMenuItem>Delete</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -203,7 +223,41 @@ export default function InventoryPage() {
             </Table>
           </CardContent>
         </Card>
+        
+        <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Edit Product</DialogTitle>
+                    <DialogDescription>
+                        Update the details of your product.
+                    </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleEditProduct}>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="edit-name" className="text-right">Name</Label>
+                            <Input id="edit-name" name="name" defaultValue={editingProduct?.name} className="col-span-3" required />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="edit-price" className="text-right">Price</Label>
+                            <Input id="edit-price" name="price" type="number" defaultValue={editingProduct?.price} className="col-span-3" required />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="edit-stock" className="text-right">Stock</Label>
+                            <Input id="edit-stock" name="stock" type="number" defaultValue={editingProduct?.stock} className="col-span-3" required />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+                        <Button type="submit">Save Changes</Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+
       </main>
     </div>
   );
 }
+
+    
