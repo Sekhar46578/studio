@@ -57,7 +57,7 @@ const AppStoreProvider = ({ children }: { children: ReactNode }) => {
     );
 }
 
-const useProductStore = <T,>(selector: (state: AppState) => T): T => {
+const useProductStore = <T,>(selector?: (state: AppState) => T): T | AppState => {
     const store = useContext(AppStoreContext);
     if (!store) {
         throw new Error('useProductStore must be used within an AppStoreProvider');
@@ -68,9 +68,14 @@ const useProductStore = <T,>(selector: (state: AppState) => T): T => {
         setHydrated(true);
     }, []);
 
-    const state = useStore(store, selector);
+    const state = useStore(store, selector || ((s) => s));
+    
+    if (!hydrated) {
+        const initialState = createAppStore().getState();
+        return selector ? selector(initialState) : initialState;
+    }
 
-    return hydrated ? state : selector(createAppStore().getState());
+    return state;
 };
 
 export { createAppStore as createProductStore, AppStoreProvider as ProductStoreProvider, useProductStore };
