@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Plus, Minus, PlusCircle, Trash2, Camera, Check, ChevronsUpDown } from "lucide-react";
+import { Plus, Minus, PlusCircle, Trash2, ChevronsUpDown, Check } from "lucide-react";
 import { Header } from "@/components/header";
 import {
   Card,
@@ -13,36 +13,19 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import type { Sale, SaleItem } from "@/lib/types";
 import { useTranslation } from "@/lib/hooks/use-translation";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
 
 import { useProductStore } from "@/store/products";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-const FAKE_BARCODE_SCANNER_DELAY = 1000;
+import { Label } from "@/components/ui/label";
 
 export default function SalesPage() {
   const { t } = useTranslation();
@@ -52,46 +35,8 @@ export default function SalesPage() {
   const [newSaleItems, setNewSaleItems] = useState<SaleItem[]>([]);
   const { toast } = useToast();
   
-  const [isScannerOpen, setScannerOpen] = useState(false);
-  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [barcode, setBarcode] = useState('');
   const [openPopoverIndex, setOpenPopoverIndex] = useState<number | null>(null);
-
-
-  useEffect(() => {
-    if (isScannerOpen) {
-      const getCameraPermission = async () => {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-          setHasCameraPermission(true);
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-          setTimeout(() => {
-             handleBarcodeScan("8901234567890");
-          }, FAKE_BARCODE_SCANNER_DELAY * 2);
-
-        } catch (error) {
-          console.error("Error accessing camera:", error);
-          setHasCameraPermission(false);
-          toast({
-            variant: "destructive",
-            title: "Camera Access Denied",
-            description: "Please enable camera permissions in your browser settings to use the scanner.",
-          });
-          setScannerOpen(false);
-        }
-      };
-      getCameraPermission();
-    } else {
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-        videoRef.current.srcObject = null;
-      }
-    }
-  }, [isScannerOpen, toast]);
-  
 
   const addSaleItem = (productId?: string) => {
     const availableProducts = products.filter(
@@ -140,14 +85,16 @@ export default function SalesPage() {
     }
   };
 
-  const handleBarcodeScan = (scannedBarcode: string) => {
-    const product = products.find(p => p.barcode === scannedBarcode);
+  const handleBarcodeScan = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const product = products.find(p => p.barcode === barcode);
     if (product) {
       addSaleItem(product.id);
       toast({
         title: "Product Added",
         description: `${product.name} was added to the sale.`,
       });
+      setBarcode(''); // Clear input after successful scan
     } else {
       toast({
         variant: "destructive",
@@ -155,7 +102,6 @@ export default function SalesPage() {
         description: "No product matches the scanned barcode.",
       });
     }
-     setScannerOpen(false);
   };
 
 
@@ -245,36 +191,21 @@ export default function SalesPage() {
                       Add products to create a new sale.
                   </CardDescription>
                 </div>
-                <Dialog open={isScannerOpen} onOpenChange={setScannerOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full sm:w-auto">
-                      <Camera className="mr-2 h-4 w-4" />
-                      Scan Barcode
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle>Barcode Scanner</DialogTitle>
-                    </DialogHeader>
-                    <div className="relative">
-                      <video ref={videoRef} className="w-full aspect-video rounded-md" autoPlay muted playsInline />
-                      {hasCameraPermission === false && (
-                         <Alert variant="destructive">
-                            <AlertTitle>Camera Access Required</AlertTitle>
-                            <AlertDescription>
-                              Please allow camera access to use this feature.
-                            </AlertDescription>
-                        </Alert>
-                      )}
-                       <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-3/4 h-1/3 border-2 border-red-500 rounded-md" />
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
               </div>
             </CardHeader>
             <CardContent>
+            <form onSubmit={handleBarcodeScan} className="mb-6 space-y-2">
+              <Label htmlFor="barcode">Scan or Enter Barcode</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="barcode"
+                  value={barcode}
+                  onChange={(e) => setBarcode(e.target.value)}
+                  placeholder="Enter barcode number"
+                />
+                <Button type="submit">Add by Barcode</Button>
+              </div>
+            </form>
             <div className="space-y-4">
                 {newSaleItems.map((item, index) => {
                   const product = products.find(p => p.id === item.productId);
@@ -369,3 +300,5 @@ export default function SalesPage() {
     </div>
   );
 }
+
+    
