@@ -2,5 +2,4 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/get-optimal-stock-levels.ts';
-import '@/ai/flows/generate-report.ts';
+// Intentionally left empty. Flows can be added here.

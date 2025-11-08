@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo } from "react";
@@ -50,9 +49,7 @@ import {
   Bar,
 } from "recharts";
 import { isWithinInterval, startOfDay } from "date-fns";
-import { generateReport, GenerateReportOutput } from "@/ai/flows/generate-report";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { marked } from "marked";
 
 export default function TrendsPage() {
   const { t } = useTranslation();
@@ -63,9 +60,6 @@ export default function TrendsPage() {
   });
 
   const [isReportDialogOpen, setReportDialogOpen] = useState(false);
-  const [reportContent, setReportContent] = useState<GenerateReportOutput | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-
 
   const filteredSales = useMemo(() => {
     return sales.filter(sale => {
@@ -80,6 +74,9 @@ export default function TrendsPage() {
   }, [sales, date]);
 
   const analysis = useMemo(() => {
+    const totalSales = filteredSales.reduce((acc, sale) => acc + sale.total, 0);
+    const totalItemsSold = filteredSales.reduce((acc, sale) => acc + sale.items.reduce((itemAcc, item) => itemAcc + item.quantity, 0), 0);
+
     const salesOverTime = filteredSales.reduce((acc, sale) => {
       const day = format(new Date(sale.date), 'MMM dd');
       if (!acc[day]) {
@@ -108,40 +105,17 @@ export default function TrendsPage() {
     const lowStockProducts = products.filter(p => p.stock <= p.lowStockThreshold);
 
     return {
+      totalSales,
+      totalItemsSold,
       salesOverTime: Object.entries(salesOverTime).map(([date, total]) => ({ date, total })).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
       top5Products,
       lowStockProducts,
     };
   }, [filteredSales, products]);
   
-  const handleGenerateReport = async () => {
-    setIsGenerating(true);
+  const handleGenerateReport = () => {
     setReportDialogOpen(true);
-    try {
-        const report = await generateReport({
-            products,
-            sales: filteredSales,
-            dateRange: {
-                from: date?.from?.toISOString() || '',
-                to: date?.to?.toISOString() || '',
-            }
-        });
-        setReportContent(report);
-    } catch (error) {
-        console.error("Failed to generate report:", error);
-        // You might want to show a toast notification here
-    } finally {
-        setIsGenerating(false);
-    }
   };
-
-  const renderMarkdown = (content: string) => {
-    if (!content) return null;
-    const rawMarkup = marked(content);
-    // TODO: Sanitize this before rendering
-    return <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: rawMarkup as string }} />;
-  };
-
 
   return (
     <div className="flex min-h-screen w-full flex-col">
@@ -150,9 +124,9 @@ export default function TrendsPage() {
         <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold">Sales Trends</h1>
              <div className="flex items-center gap-2">
-                <Button onClick={handleGenerateReport} disabled={isGenerating}>
+                <Button onClick={handleGenerateReport}>
                     <FileText className="mr-2 h-4 w-4" />
-                    {isGenerating ? "Generating..." : "Generate AI Report"}
+                    Generate Report
                 </Button>
                 <Popover>
                     <PopoverTrigger asChild>
@@ -256,34 +230,48 @@ export default function TrendsPage() {
         <Dialog open={isReportDialogOpen} onOpenChange={setReportDialogOpen}>
             <DialogContent className="max-w-3xl">
                 <DialogHeader>
-                    <DialogTitle>AI Generated Report</DialogTitle>
+                    <DialogTitle>Generated Report</DialogTitle>
                     <DialogDescription>
                         An analysis of your sales data for the selected period.
                     </DialogDescription>
                 </DialogHeader>
                 <ScrollArea className="h-[60vh] p-1">
-                    {isGenerating ? (
-                         <div className="flex items-center justify-center h-full">
-                            <p>Generating your report...</p>
+                    <div className="space-y-6 prose prose-sm max-w-none">
+                        <div>
+                            <h3 className="font-semibold text-lg mb-2">Summary</h3>
+                            <p>
+                                In the selected period, you had <strong>{filteredSales.length}</strong> sales transactions, totaling <strong>₹{analysis.totalSales.toFixed(2)}</strong>.
+                                A total of <strong>{analysis.totalItemsSold}</strong> items were sold.
+                            </p>
                         </div>
-                    ) : (
-                        reportContent && (
-                            <div className="space-y-6">
-                                <div>
-                                    <h3 className="font-semibold text-lg mb-2">Trend Summary</h3>
-                                    {renderMarkdown(reportContent.trendSummary)}
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-lg mb-2">Stock Recommendations</h3>
-                                    {renderMarkdown(reportContent.stockRecommendations)}
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-lg mb-2">Additional Insights</h3>
-                                    {renderMarkdown(reportContent.additionalInsights)}
-                                </div>
-                            </div>
-                        )
-                    )}
+                        <div>
+                            <h3 className="font-semibold text-lg mb-2">Top Selling Products</h3>
+                            {analysis.top5Products.length > 0 ? (
+                                <ul>
+                                    {analysis.top5Products.map(p => (
+                                        <li key={p.name}>{p.name}: {p.quantity} units sold</li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p>No products sold in this period.</p>
+                            )}
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-lg mb-2">Stock Information</h3>
+                             {analysis.lowStockProducts.length > 0 ? (
+                                <>
+                                 <p>The following <strong>{analysis.lowStockProducts.length}</strong> items are running low on stock and may need to be reordered:</p>
+                                 <ul>
+                                    {analysis.lowStockProducts.map(p => (
+                                        <li key={p.id}>{p.name} (Current stock: {p.stock})</li>
+                                    ))}
+                                </ul>
+                                </>
+                            ) : (
+                                <p>All product stock levels are healthy. No items are currently below their low-stock threshold.</p>
+                            )}
+                        </div>
+                    </div>
                 </ScrollArea>
             </DialogContent>
         </Dialog>
