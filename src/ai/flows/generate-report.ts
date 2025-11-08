@@ -47,29 +47,30 @@ const GenerateReportOutputSchema = z.object({
 });
 export type GenerateReportOutput = z.infer<typeof GenerateReportOutputSchema>;
 
-const reportPrompt = ai.definePrompt({
-  name: 'generateReportPrompt',
-  input: { schema: GenerateReportInputSchema },
-  output: { schema: GenerateReportOutputSchema },
-  model: 'googleai/gemini-1.5-flash-latest',
-  prompt: `You are a business analyst for a small retail shop. Analyze the provided sales and product data to generate a report.
-  The data covers the period from {{{dateRange.from}}} to {{{dateRange.to}}}.
+const reportPrompt = `You are a business analyst for a small retail shop. Analyze the provided sales and product data to generate a report.
+  The data covers the period from {dateRange.from} to {dateRange.to}.
   
   Products:
-  {{{json products}}}
+  {json products}
 
   Sales:
-  {{{json sales}}}
+  {json sales}
 
   Provide a concise report covering:
   1.  **Trend Summary**: What are the key sales trends? Are sales going up or down? What are the top-selling products in the period?
   2.  **Stock Recommendations**: Based on sales velocity and current stock, which items should be re-ordered soon? Are any items overstocked?
-  3 ' **Additional Insights**: Are there any other interesting patterns, like products often bought together, or opportunities to increase sales?
+  3.  **Additional Insights**: Are there any other interesting patterns, like products often bought together, or opportunities to increase sales?
   
-  Format the entire response in Markdown. Use headings, bold text, and bullet points to make it readable.`,
-});
+  Format the entire response in Markdown. Use headings, bold text, and bullet points to make it readable.`;
 
 export async function generateReport(input: GenerateReportInput): Promise<GenerateReportOutput> {
-  const { output } = await reportPrompt(input);
+  const { output } = await ai.generate({
+    model: 'googleai/gemini-1.5-flash-latest',
+    prompt: reportPrompt,
+    input: input,
+    output: {
+      schema: GenerateReportOutputSchema,
+    },
+  });
   return output!;
 }
