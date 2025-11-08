@@ -10,6 +10,7 @@ interface AppState {
   sales: Sale[];
   addProduct: (product: Product) => void;
   updateProduct: (product: Product) => void;
+  deleteProduct: (productId: string) => void;
   decreaseStock: (productId: string, quantity: number) => void;
   addSale: (sale: Sale) => void;
 }
@@ -20,6 +21,9 @@ const createAppStore = () => create<AppState>((set) => ({
   addProduct: (product) => set((state) => ({ products: [product, ...state.products] })),
   updateProduct: (product) => set((state) => ({
     products: state.products.map((p) => (p.id === product.id ? product : p)),
+  })),
+  deleteProduct: (productId) => set((state) => ({
+    products: state.products.filter((p) => p.id !== productId),
   })),
   decreaseStock: (productId, quantity) =>
     set((state) => ({
@@ -53,5 +57,3 @@ const useAppStore = <T,>(selector: (state: AppState) => T): T => {
 };
 
 export { createAppStore as createProductStore, AppStoreProvider as ProductStoreProvider, useAppStore as useProductStore };
-
-    
