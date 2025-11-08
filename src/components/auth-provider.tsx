@@ -36,13 +36,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = (email: string) => {
     // This is a mock login. In a real app, you'd find the user.
     // For now, we'll just create a user with the provided email.
-    const mockUser: User = { name: 'Shop Owner', email, picture: '/avatars/01.png' };
+    const mockUser: User = { name: 'Shop Owner', email, picture: '' };
     localStorage.setItem('shopstock-user', JSON.stringify(mockUser));
     setUser(mockUser);
   };
   
   const signup = (name: string, email: string) => {
-    const newUser: User = { name, email, picture: '/avatars/01.png' };
+    const newUser: User = { name, email, picture: '' };
     localStorage.setItem('shopstock-user', JSON.stringify(newUser));
     setUser(newUser);
   };
