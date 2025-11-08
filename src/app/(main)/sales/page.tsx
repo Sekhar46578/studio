@@ -35,7 +35,6 @@ export default function SalesPage() {
   const [newSaleItems, setNewSaleItems] = useState<SaleItem[]>([]);
   const { toast } = useToast();
   
-  const [barcode, setBarcode] = useState('');
   const [openPopoverIndex, setOpenPopoverIndex] = useState<number | null>(null);
 
   const addSaleItem = (productId?: string) => {
@@ -84,26 +83,6 @@ export default function SalesPage() {
       });
     }
   };
-
-  const handleBarcodeScan = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const product = products.find(p => p.barcode === barcode);
-    if (product) {
-      addSaleItem(product.id);
-      toast({
-        title: "Product Added",
-        description: `${product.name} was added to the sale.`,
-      });
-      setBarcode(''); // Clear input after successful scan
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Product Not Found",
-        description: "No product matches the scanned barcode.",
-      });
-    }
-  };
-
 
   const updateSaleItem = (index: number, field: keyof SaleItem, value: string | number) => {
     const items = [...newSaleItems];
@@ -194,18 +173,6 @@ export default function SalesPage() {
               </div>
             </CardHeader>
             <CardContent>
-            <form onSubmit={handleBarcodeScan} className="mb-6 space-y-2">
-              <Label htmlFor="barcode">Scan or Enter Barcode</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="barcode"
-                  value={barcode}
-                  onChange={(e) => setBarcode(e.target.value)}
-                  placeholder="Enter barcode number"
-                />
-                <Button type="submit">Add by Barcode</Button>
-              </div>
-            </form>
             <div className="space-y-4">
                 {newSaleItems.map((item, index) => {
                   const product = products.find(p => p.id === item.productId);

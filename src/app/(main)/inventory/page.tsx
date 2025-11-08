@@ -72,7 +72,6 @@ export default function InventoryPage() {
       stock: Number(formData.get("stock")),
       lowStockThreshold: Number(formData.get("lowStockThreshold")),
       category: formData.get("category") as string,
-      barcode: formData.get("barcode") as string,
       imageUrl: `https://picsum.photos/seed/${Date.now()}/400/300`,
       unit: formData.get("unit") as string,
     };
@@ -136,10 +135,6 @@ export default function InventoryPage() {
                         <div className="grid grid-cols-4 items-center gap-4">
                           <Label htmlFor="category" className="text-right">{t.category}</Label>
                           <Input id="category" name="category" className="col-span-3" required />
-                        </div>
-                         <div className="grid grid-cols-4 items-center gap-4">
-                          <Label htmlFor="barcode" className="text-right">Barcode</Label>
-                          <Input id="barcode" name="barcode" className="col-span-3" />
                         </div>
                          <div className="grid grid-cols-4 items-center gap-4">
                           <Label htmlFor="unit" className="text-right">Unit</Label>
