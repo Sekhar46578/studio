@@ -36,7 +36,7 @@ import {
 
 export default function DashboardPage() {
   const { t } = useTranslation();
-  const { products, sales } = useProductStore();
+  const { products, sales } = useProductStore() as { products: any[], sales: any[]};
 
   const todayStats = useMemo(() => {
     const todaySales = sales.filter(sale => isToday(new Date(sale.date)));

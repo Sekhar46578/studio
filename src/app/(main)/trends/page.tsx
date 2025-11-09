@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -53,7 +54,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function TrendsPage() {
   const { t } = useTranslation();
-  const { products, sales } = useProductStore();
+  const { products, sales } = useProductStore() as { products: any[], sales: any[] };
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
     to: new Date(),
@@ -122,11 +123,11 @@ export default function TrendsPage() {
       <Header title={t.trends} />
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
         <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold">Sales Trends</h1>
+            <h1 className="text-2xl font-semibold">{t.salesTrendAnalysis}</h1>
              <div className="flex items-center gap-2">
                 <Button onClick={handleGenerateReport}>
                     <FileText className="mr-2 h-4 w-4" />
-                    Generate Report
+                    {t.analyzeTrends}
                 </Button>
                 <Popover>
                     <PopoverTrigger asChild>
@@ -169,7 +170,7 @@ export default function TrendsPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
             <Card>
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><TrendingUp className="h-5 w-5"/>Sales Trend Over Time</CardTitle>
+                    <CardTitle className="flex items-center gap-2"><TrendingUp className="h-5 w-5"/>{t.trendSummary}</CardTitle>
                 </CardHeader>
                 <CardContent className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
@@ -185,7 +186,7 @@ export default function TrendsPage() {
             </Card>
             <Card>
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Package className="h-5 w-5"/>Top 5 Selling Products</CardTitle>
+                    <CardTitle className="flex items-center gap-2"><Package className="h-5 w-5"/>{t.bestSellingProducts}</CardTitle>
                 </CardHeader>
                 <CardContent className="h-[300px]">
                      <ResponsiveContainer width="100%" height="100%">
@@ -201,14 +202,14 @@ export default function TrendsPage() {
             </Card>
             <Card className="md:col-span-2">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><AlertTriangle className="h-5 w-5 text-yellow-500"/>Low Stock Alerts</CardTitle>
+                    <CardTitle className="flex items-center gap-2"><AlertTriangle className="h-5 w-5 text-yellow-500"/>{t.lowStockAlert}</CardTitle>
                 </CardHeader>
                 <CardContent className="h-[300px] overflow-auto">
                      <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Product</TableHead>
-                                <TableHead className="text-right">Stock</TableHead>
+                                <TableHead>{t.productName}</TableHead>
+                                <TableHead className="text-right">{t.stock}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -230,7 +231,7 @@ export default function TrendsPage() {
         <Dialog open={isReportDialogOpen} onOpenChange={setReportDialogOpen}>
             <DialogContent className="max-w-3xl">
                 <DialogHeader>
-                    <DialogTitle>Generated Report</DialogTitle>
+                    <DialogTitle>{t.trendSummary}</DialogTitle>
                     <DialogDescription>
                         An analysis of your sales data for the selected period.
                     </DialogDescription>
@@ -245,11 +246,11 @@ export default function TrendsPage() {
                             </p>
                         </div>
                         <div>
-                            <h3 className="font-semibold text-lg mb-2">Top Selling Products</h3>
+                            <h3 className="font-semibold text-lg mb-2">{t.bestSellingProducts}</h3>
                             {analysis.top5Products.length > 0 ? (
                                 <ul>
                                     {analysis.top5Products.map(p => (
-                                        <li key={p.name}>{p.name}: {p.quantity} units sold</li>
+                                        <li key={p.name}>{p.name}: {p.quantity} {t.unitsSold}</li>
                                     ))}
                                 </ul>
                             ) : (
@@ -257,7 +258,7 @@ export default function TrendsPage() {
                             )}
                         </div>
                         <div>
-                            <h3 className="font-semibold text-lg mb-2">Stock Information</h3>
+                            <h3 className="font-semibold text-lg mb-2">{t.stockRecommendations}</h3>
                              {analysis.lowStockProducts.length > 0 ? (
                                 <>
                                  <p>The following <strong>{analysis.lowStockProducts.length}</strong> items are running low on stock and may need to be reordered:</p>

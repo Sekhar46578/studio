@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Plus, Minus, PlusCircle, Trash2, ChevronsUpDown, Check } from "lucide-react";
 import { Header } from "@/components/header";
 import {
@@ -25,13 +25,12 @@ import {
 import { useProductStore } from "@/store/products";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Label } from "@/components/ui/label";
 
 export default function SalesPage() {
   const { t } = useTranslation();
-  const products = useProductStore((state) => state.products);
-  const decreaseStock = useProductStore((state) => state.decreaseStock);
-  const addSale = useProductStore((state) => state.addSale);
+  const products = useProductStore((state) => state.products) as any[];
+  const decreaseStock = useProductStore((state) => state.decreaseStock) as (productId: string, quantity: number) => void;
+  const addSale = useProductStore((state) => state.addSale) as (sale: Sale) => void;
   const [newSaleItems, setNewSaleItems] = useState<SaleItem[]>([]);
   const { toast } = useToast();
   
@@ -267,5 +266,3 @@ export default function SalesPage() {
     </div>
   );
 }
-
-    

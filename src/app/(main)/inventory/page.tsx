@@ -58,10 +58,10 @@ import {
 
 export default function InventoryPage() {
   const { t } = useTranslation();
-  const products = useProductStore((state) => state.products);
-  const addProduct = useProductStore((state) => state.addProduct);
-  const updateProduct = useProductStore((state) => state.updateProduct);
-  const deleteProduct = useProductStore((state) => state.deleteProduct);
+  const products = useProductStore((state) => state.products) as Product[];
+  const addProduct = useProductStore((state) => state.addProduct) as (product: Product) => void;
+  const updateProduct = useProductStore((state) => state.updateProduct) as (product: Product) => void;
+  const deleteProduct = useProductStore((state) => state.deleteProduct) as (productId: string) => void;
 
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
@@ -257,20 +257,20 @@ export default function InventoryPage() {
                 <form onSubmit={handleEditProduct}>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="edit-name" className="text-right">Name</Label>
+                            <Label htmlFor="edit-name" className="text-right">{t.productName}</Label>
                             <Input id="edit-name" name="name" defaultValue={editingProduct?.name} className="col-span-3" required />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="edit-price" className="text-right">Price</Label>
+                            <Label htmlFor="edit-price" className="text-right">{t.price}</Label>
                             <Input id="edit-price" name="price" type="number" defaultValue={editingProduct?.price} className="col-span-3" required />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="edit-stock" className="text-right">Stock</Label>
+                            <Label htmlFor="edit-stock" className="text-right">{t.stock}</Label>
                             <Input id="edit-stock" name="stock" type="number" defaultValue={editingProduct?.stock} className="col-span-3" required />
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button type="button" variant="outline" onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+                        <Button type="button" variant="outline" onClick={() => setEditDialogOpen(false)}>{t.cancel}</Button>
                         <Button type="submit">Save Changes</Button>
                     </DialogFooter>
                 </form>
@@ -287,7 +287,7 @@ export default function InventoryPage() {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
               <AlertDialogAction onClick={handleDeleteProduct}>
                 Continue
               </AlertDialogAction>
