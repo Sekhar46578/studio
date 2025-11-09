@@ -28,8 +28,8 @@ export default function RootLayout({
         <I18nProvider>
           <AuthProvider>
             {children}
-            <Toaster />
           </AuthProvider>
+          <Toaster />
         </I18nProvider>
       </body>
     </html>

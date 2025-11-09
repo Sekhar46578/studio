@@ -1,6 +1,6 @@
 
 import { create, useStore } from 'zustand';
-import { Product, Sale } from '@/lib/types';
+import { Product, Sale, User } from '@/lib/types';
 import { INITIAL_PRODUCTS, MOCK_SALES } from '@/lib/constants';
 import { createContext, useContext, useRef, type ReactNode, useEffect, useState } from 'react';
 import type { StoreApi } from 'zustand';
@@ -16,40 +16,53 @@ interface AppState {
   addSale: (sale: Sale) => void;
 }
 
-const createAppStore = () => create(
-  persist<AppState>(
-    (set) => ({
-      products: INITIAL_PRODUCTS,
-      sales: MOCK_SALES,
-      addProduct: (product) => set((state) => ({ products: [product, ...state.products] })),
-      updateProduct: (product) => set((state) => ({
-        products: state.products.map((p) => (p.id === product.id ? product : p)),
-      })),
-      deleteProduct: (productId) => set((state) => ({
-        products: state.products.filter((p) => p.id !== productId),
-      })),
-      decreaseStock: (productId, quantity) =>
-        set((state) => ({
-          products: state.products.map((p) =>
-            p.id === productId ? { ...p, stock: Math.max(0, p.stock - quantity) } : p
-          ),
+const createAppStore = (user: User | null) => {
+  const storageName = user ? `shopstock-storage-${user.email}` : 'shopstock-storage-guest';
+  
+  // For new users, we'll give them empty arrays instead of mock data
+  const isNewUser = user && !localStorage.getItem(storageName);
+  const initialProducts = isNewUser ? [] : INITIAL_PRODUCTS;
+  const initialSales = isNewUser ? [] : MOCK_SALES;
+
+  return create(
+    persist<AppState>(
+      (set) => ({
+        products: initialProducts,
+        sales: initialSales,
+        addProduct: (product) => set((state) => ({ products: [product, ...state.products] })),
+        updateProduct: (product) => set((state) => ({
+          products: state.products.map((p) => (p.id === product.id ? product : p)),
         })),
-      addSale: (sale) => set((state) => ({ sales: [sale, ...state.sales] })),
-    }),
-    {
-      name: 'shopstock-storage', // name of the item in the storage (must be unique)
-      storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
-    }
-  )
-);
+        deleteProduct: (productId) => set((state) => ({
+          products: state.products.filter((p) => p.id !== productId),
+        })),
+        decreaseStock: (productId, quantity) =>
+          set((state) => ({
+            products: state.products.map((p) =>
+              p.id === productId ? { ...p, stock: Math.max(0, p.stock - quantity) } : p
+            ),
+          })),
+        addSale: (sale) => set((state) => ({ sales: [sale, ...state.sales] })),
+      }),
+      {
+        name: storageName,
+        storage: createJSONStorage(() => localStorage), 
+      }
+    )
+  );
+};
+
 
 const AppStoreContext = createContext<StoreApi<AppState> | null>(null);
 
-const AppStoreProvider = ({ children }: { children: ReactNode }) => {
+const ProductStoreProvider = ({ children, user }: { children: ReactNode, user: User | null }) => {
     const storeRef = useRef<StoreApi<AppState>>();
-    if (!storeRef.current) {
-        storeRef.current = createAppStore();
+    
+    // Create a new store whenever the user changes
+    if (!storeRef.current || storeRef.current.getState().products !== createAppStore(user).getState().products) {
+        storeRef.current = createAppStore(user);
     }
+
     return (
         <AppStoreContext.Provider value={storeRef.current}>
             {children}
@@ -71,11 +84,14 @@ const useProductStore = <T,>(selector?: (state: AppState) => T): T | AppState =>
     const state = useStore(store, selector || ((s) => s));
     
     if (!hydrated) {
-        const initialState = createAppStore().getState();
-        return selector ? selector(initialState) : initialState;
+        const initialState = store.getState();
+        if(selector){
+            return selector(initialState);
+        }
+        return initialState;
     }
 
     return state;
 };
 
-export { createAppStore as createProductStore, AppStoreProvider as ProductStoreProvider, useProductStore };
+export { createAppStore as createProductStore, ProductStoreProvider, useProductStore };

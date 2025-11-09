@@ -4,6 +4,7 @@ import React, { createContext, useState, useEffect, useContext, ReactNode } from
 import type { User } from '@/lib/types';
 import { Skeleton } from './ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { ProductStoreProvider } from '@/store/products.tsx';
 
 interface AuthContextType {
   user: User | null;
@@ -120,7 +121,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout, signup, updateUser }}>
-      {children}
+      <ProductStoreProvider user={user}>
+        {children}
+      </ProductStoreProvider>
     </AuthContext.Provider>
   );
 }

@@ -15,7 +15,6 @@ import {
 import { Logo } from '@/components/icons';
 import { Nav } from '@/components/nav';
 import Link from 'next/link';
-import { ProductStoreProvider } from '@/store/products.tsx';
 
 export default function MainLayout({
   children,
@@ -40,7 +39,6 @@ export default function MainLayout({
   }
 
   return (
-    <ProductStoreProvider>
       <SidebarProvider>
         <Sidebar>
           <SidebarHeader>
@@ -60,6 +58,5 @@ export default function MainLayout({
           {children}
         </SidebarInset>
       </SidebarProvider>
-    </ProductStoreProvider>
   );
 }
