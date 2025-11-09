@@ -34,20 +34,22 @@ import { useProductStore } from "@/store/products";
 
 export default function HistoryPage() {
   const { t } = useTranslation();
-  const products = useProductStore((state) => state.products);
-  const sales = useProductStore((state) => state.sales);
+  const products = useProductStore((state) => state.products) as any[];
+  const sales = useProductStore((state) => state.sales) as any[];
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
     to: new Date(),
   });
 
-  const filteredSales = sales.filter(sale => {
-    const saleDate = new Date(sale.date);
-    if(date?.from && date?.to){
-        return saleDate >= date.from && saleDate <= date.to;
-    }
-    return true;
-  });
+  const filteredSales = sales
+    .filter(sale => {
+      const saleDate = new Date(sale.date);
+      if(date?.from && date?.to){
+          return saleDate >= date.from && saleDate <= date.to;
+      }
+      return true;
+    })
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
     <div className="flex min-h-screen w-full flex-col">
