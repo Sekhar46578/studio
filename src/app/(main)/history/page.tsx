@@ -41,7 +41,7 @@ export default function HistoryPage() {
     to: new Date(),
   });
 
-  const filteredSales = sales
+  const filteredSales = (sales || [])
     .filter(sale => {
       const saleDate = new Date(sale.date);
       if(date?.from && date?.to){

@@ -42,7 +42,6 @@ const createAppStore = (user: User | null) => {
       {
         name: storageName,
         storage: createJSONStorage(() => localStorage), 
-        // When a new user signs up, give them default products but empty sales.
         onRehydrateStorage: () => (state, error) => {
           if (error) {
             console.log('an error happened during hydration', error)
@@ -64,13 +63,23 @@ const AppStoreContext = createContext<StoreApi<AppState> | null>(null);
 const ProductStoreProvider = ({ children, user }: { children: ReactNode, user: User | null }) => {
     const storeRef = useRef<StoreApi<AppState>>();
     
-    // Create a new store whenever the user changes
-    if (!storeRef.current || storeRef.current.getState().products !== createAppStore(user).getState().products) {
-        storeRef.current = createAppStore(user);
+    // This part is crucial. We create a new store ONLY when the user changes.
+    // By using `user?.email` as a key, we force React to re-render and create a new provider
+    // with a new store when the user logs in or out.
+    const userKey = user?.email || 'guest';
+    
+    // We store the created stores in a map to avoid re-creating them on every render
+    const [stores, setStores] = useState(new Map<string, StoreApi<AppState>>());
+
+    if (!stores.has(userKey)) {
+        const newStore = createAppStore(user);
+        setStores(new Map(stores.set(userKey, newStore)));
     }
+    
+    storeRef.current = stores.get(userKey);
 
     return (
-        <AppStoreContext.Provider value={storeRef.current}>
+        <AppStoreContext.Provider value={storeRef.current!}>
             {children}
         </AppStoreContext.Provider>
     );
@@ -81,22 +90,21 @@ const useProductStore = <T,>(selector?: (state: AppState) => T): T | AppState =>
     if (!store) {
         throw new Error('useProductStore must be used within an AppStoreProvider');
     }
-    // This part is crucial for handling hydration issues with Zustand and Next.js
+    const state = useStore(store, selector || ((s) => s));
+    
     const [hydrated, setHydrated] = useState(false);
     useEffect(() => {
         setHydrated(true);
     }, []);
 
-    const state = useStore(store, selector || ((s) => s));
-    
     if (!hydrated) {
         const initialState = store.getState();
         if(selector){
             return selector(initialState);
         }
-        return initialState;
+        return initialState as AppState;
     }
-
+    
     return state;
 };
 
