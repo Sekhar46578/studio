@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useState } from "react";
-import { format } from "date-fns";
+import { useState, useMemo } from "react";
+import { format, isWithinInterval, startOfDay } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { Header } from "@/components/header";
@@ -41,15 +41,19 @@ export default function HistoryPage() {
     to: new Date(),
   });
 
-  const filteredSales = (sales || [])
-    .filter(sale => {
-      const saleDate = new Date(sale.date);
-      if(date?.from && date?.to){
-          return saleDate >= date.from && saleDate <= date.to;
-      }
-      return true;
-    })
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const filteredSales = useMemo(() => {
+    return (sales || [])
+      .filter(sale => {
+        const saleDate = new Date(sale.date);
+        if (date?.from && date?.to) {
+          const from = startOfDay(date.from);
+          const to = date.to;
+          return isWithinInterval(saleDate, { start: from, end: to });
+        }
+        return true;
+      })
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [sales, date]);
 
   return (
     <div className="flex min-h-screen w-full flex-col">
