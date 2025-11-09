@@ -19,16 +19,11 @@ interface AppState {
 const createAppStore = (user: User | null) => {
   const storageName = user ? `shopstock-storage-${user.email}` : 'shopstock-storage-guest';
   
-  // For new users, we'll give them empty arrays instead of mock data
-  const isNewUser = user && !localStorage.getItem(storageName);
-  const initialProducts = isNewUser ? [] : INITIAL_PRODUCTS;
-  const initialSales = isNewUser ? [] : MOCK_SALES;
-
   return create(
     persist<AppState>(
       (set) => ({
-        products: initialProducts,
-        sales: initialSales,
+        products: INITIAL_PRODUCTS,
+        sales: MOCK_SALES,
         addProduct: (product) => set((state) => ({ products: [product, ...state.products] })),
         updateProduct: (product) => set((state) => ({
           products: state.products.map((p) => (p.id === product.id ? product : p)),
@@ -47,6 +42,17 @@ const createAppStore = (user: User | null) => {
       {
         name: storageName,
         storage: createJSONStorage(() => localStorage), 
+        // When a new user signs up, give them default products but empty sales.
+        onRehydrateStorage: () => (state, error) => {
+          if (error) {
+            console.log('an error happened during hydration', error)
+          } else {
+            const isNewUser = user && !localStorage.getItem(storageName);
+            if (isNewUser && state) {
+              state.sales = [];
+            }
+          }
+        },
       }
     )
   );
