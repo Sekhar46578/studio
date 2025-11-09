@@ -39,9 +39,11 @@ export default function LoginPage() {
     },
   });
 
-  const onSubmit = (data: LoginFormValues) => {
-    login(data.email);
-    router.push('/');
+  const onSubmit = async (data: LoginFormValues) => {
+    const success = await login(data.email, data.password);
+    if (success) {
+      router.push('/');
+    }
   };
 
   return (
@@ -81,8 +83,8 @@ export default function LoginPage() {
                 <p className="text-sm text-destructive">{form.formState.errors.password.message}</p>
               )}
             </div>
-            <Button type="submit" className="w-full">
-              {t.login}
+            <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? 'Logging in...' : t.login}
             </Button>
           </form>
            <div className="mt-4 text-center text-sm">

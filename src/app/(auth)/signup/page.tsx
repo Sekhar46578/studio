@@ -41,9 +41,11 @@ export default function SignupPage() {
     },
   });
 
-  const onSubmit = (data: SignupFormValues) => {
-    signup(data.name, data.email);
-    router.push('/');
+  const onSubmit = async (data: SignupFormValues) => {
+    const success = await signup(data.name, data.email, data.password);
+    if(success) {
+      router.push('/');
+    }
   };
 
   return (
@@ -96,8 +98,8 @@ export default function SignupPage() {
                 <p className="text-sm text-destructive">{form.formState.errors.password.message}</p>
               )}
             </div>
-            <Button type="submit" className="w-full">
-              {t.signup}
+            <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? 'Creating Account...' : t.signup}
             </Button>
           </form>
            <div className="mt-4 text-center text-sm">
