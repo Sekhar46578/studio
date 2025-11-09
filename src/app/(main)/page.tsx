@@ -81,7 +81,7 @@ export default function DashboardPage() {
   const quickActions = [
     { label: t.recordSale, href: "/sales", icon: PlusCircle },
     { label: t.inventory, href: "/inventory", icon: Archive },
-    { label: "Generate Report", href: "/trends", icon: FileText },
+    { label: t.analyzeTrends, href: "/trends", icon: FileText },
   ];
 
   return (
@@ -93,31 +93,31 @@ export default function DashboardPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Today&apos;s Summary</CardTitle>
+                <CardTitle>{t['Today\'s Summary']}</CardTitle>
                 <CardDescription>{format(new Date(), "MMMM dd, yyyy")}</CardDescription>
               </div>
                <div className="flex items-center gap-2 text-sm text-green-500">
                 <Wifi className="h-4 w-4" />
-                <span>Online</span>
+                <span>{t.Online}</span>
               </div>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                 <div>
                   <h3 className="text-2xl font-bold">₹{todayStats.totalRevenue.toFixed(2)}</h3>
-                  <p className="text-sm text-muted-foreground">Total Sales</p>
+                  <p className="text-sm text-muted-foreground">{t['Total Sales']}</p>
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold">{todayStats.transactions}</h3>
-                  <p className="text-sm text-muted-foreground">Transactions</p>
+                  <p className="text-sm text-muted-foreground">{t.Transactions}</p>
                 </div>
                  <div>
                   <h3 className="text-2xl font-bold">₹0.00</h3>
-                  <p className="text-sm text-muted-foreground">Total Profit</p>
+                  <p className="text-sm text-muted-foreground">{t['Total Profit']}</p>
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold">{todayStats.itemsSoldCount}</h3>
-                  <p className="text-sm text-muted-foreground">Items Sold</p>
+                  <p className="text-sm text-muted-foreground">{t['Items Sold']}</p>
                 </div>
               </div>
             </CardContent>
@@ -127,39 +127,39 @@ export default function DashboardPage() {
             {/* Quick Stats Cards */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base"><Star className="text-yellow-400" /> Top Selling Today</CardTitle>
+                <CardTitle className="flex items-center gap-2 text-base"><Star className="text-yellow-400" /> {t['Top Selling Today']}</CardTitle>
               </CardHeader>
               <CardContent>
                 {todayStats.topProduct ? (
-                     <p className="text-xl font-semibold">{todayStats.topProduct.name}</p>
+                     <p className="text-xl font-semibold">{t[todayStats.topProduct.name as keyof typeof t] || todayStats.topProduct.name}</p>
                 ) : (
-                    <p className="text-muted-foreground">No sales yet today.</p>
+                    <p className="text-muted-foreground">{t['No sales yet today.']}</p>
                 )}
               </CardContent>
             </Card>
 
              <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base"><AlertTriangle className="text-yellow-500" /> Low Stock Items</CardTitle>
+                <CardTitle className="flex items-center gap-2 text-base"><AlertTriangle className="text-yellow-500" /> {t['Low Stock Items']}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-xl font-semibold">{quickStats.lowStockCount}</p>
               </CardContent>
               <CardFooter>
                  <Link href="/inventory" className="text-sm text-primary hover:underline flex items-center gap-1">
-                    View All <ArrowRight className="h-4 w-4" />
+                    {t['View All']} <ArrowRight className="h-4 w-4" />
                 </Link>
               </CardFooter>
             </Card>
              <Card className="lg:col-span-1">
                  <CardHeader>
-                    <CardTitle className="text-base">Pending Restocks</CardTitle>
+                    <CardTitle className="text-base">{t['Pending Restocks']}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p className="text-xl font-semibold">0</p>
                 </CardContent>
                 <CardFooter>
-                    <p className="text-sm text-muted-foreground">No items to restock.</p>
+                    <p className="text-sm text-muted-foreground">{t['No items to restock.']}</p>
                 </CardFooter>
             </Card>
 
@@ -167,7 +167,7 @@ export default function DashboardPage() {
             {/* Graph Snapshot & Quick Actions */}
             <Card className="lg:col-span-3">
               <CardHeader>
-                <CardTitle>Last 7 Days Sales</CardTitle>
+                <CardTitle>{t['Last 7 Days Sales']}</CardTitle>
               </CardHeader>
               <CardContent className="h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
@@ -186,7 +186,7 @@ export default function DashboardPage() {
             
             <Card className="lg:col-span-3">
                 <CardHeader>
-                    <CardTitle>Quick Actions</CardTitle>
+                    <CardTitle>{t['Quick Actions']}</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {quickActions.map((action) => (
@@ -206,3 +206,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    

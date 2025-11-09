@@ -190,7 +190,7 @@ export default function TrendsPage() {
                 </CardHeader>
                 <CardContent className="h-[300px]">
                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={analysis.top5Products} layout="vertical">
+                        <BarChart data={analysis.top5Products.map(p => ({...p, name: t[p.name as keyof typeof t] || p.name}))} layout="vertical">
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis type="number" />
                             <YAxis dataKey="name" type="category" width={80} tick={{fontSize: 12}}/>
@@ -215,12 +215,12 @@ export default function TrendsPage() {
                         <TableBody>
                             {analysis.lowStockProducts.length > 0 ? analysis.lowStockProducts.map(p => (
                                 <TableRow key={p.id}>
-                                    <TableCell>{p.name}</TableCell>
+                                    <TableCell>{t[p.name as keyof typeof t] || p.name}</TableCell>
                                     <TableCell className="text-right">{p.stock}</TableCell>
                                 </TableRow>
                             )) : (
                                 <TableRow>
-                                    <TableCell colSpan={2} className="text-center text-muted-foreground">No low stock items!</TableCell>
+                                    <TableCell colSpan={2} className="text-center text-muted-foreground">{t['No low stock items!']}</TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
@@ -233,16 +233,16 @@ export default function TrendsPage() {
                 <DialogHeader>
                     <DialogTitle>{t.trendSummary}</DialogTitle>
                     <DialogDescription>
-                        An analysis of your sales data for the selected period.
+                        {t['An analysis of your sales data for the selected period.']}
                     </DialogDescription>
                 </DialogHeader>
                 <ScrollArea className="h-[60vh] p-1">
                     <div className="space-y-6 prose prose-sm max-w-none">
                         <div>
-                            <h3 className="font-semibold text-lg mb-2">Summary</h3>
+                            <h3 className="font-semibold text-lg mb-2">{t.Summary}</h3>
                             <p>
-                                In the selected period, you had <strong>{filteredSales.length}</strong> sales transactions, totaling <strong>₹{analysis.totalSales.toFixed(2)}</strong>.
-                                A total of <strong>{analysis.totalItemsSold}</strong> items were sold.
+                                {t['In the selected period, you had']} <strong>{filteredSales.length}</strong> {t['sales transactions, totaling']} <strong>₹{analysis.totalSales.toFixed(2)}</strong>.
+                                {t['A total of']} <strong>{analysis.totalItemsSold}</strong> {t['items were sold.']}
                             </p>
                         </div>
                         <div>
@@ -250,26 +250,26 @@ export default function TrendsPage() {
                             {analysis.top5Products.length > 0 ? (
                                 <ul>
                                     {analysis.top5Products.map(p => (
-                                        <li key={p.name}>{p.name}: {p.quantity} {t.unitsSold}</li>
+                                        <li key={p.name}>{t[p.name as keyof typeof t] || p.name}: {p.quantity} {t.unitsSold}</li>
                                     ))}
                                 </ul>
                             ) : (
-                                <p>No products sold in this period.</p>
+                                <p>{t['No products sold in this period.']}</p>
                             )}
                         </div>
                         <div>
                             <h3 className="font-semibold text-lg mb-2">{t.stockRecommendations}</h3>
                              {analysis.lowStockProducts.length > 0 ? (
                                 <>
-                                 <p>The following <strong>{analysis.lowStockProducts.length}</strong> items are running low on stock and may need to be reordered:</p>
+                                 <p>{t['The following']} <strong>{analysis.lowStockProducts.length}</strong> {t['items are running low on stock and may need to be reordered:']}</p>
                                  <ul>
                                     {analysis.lowStockProducts.map(p => (
-                                        <li key={p.id}>{p.name} (Current stock: {p.stock})</li>
+                                        <li key={p.id}>{t[p.name as keyof typeof t] || p.name} ({t['Current stock:']} {p.stock})</li>
                                     ))}
                                 </ul>
                                 </>
                             ) : (
-                                <p>All product stock levels are healthy. No items are currently below their low-stock threshold.</p>
+                                <p>{t['All product stock levels are healthy. No items are currently below their low-stock threshold.']}</p>
                             )}
                         </div>
                     </div>
@@ -280,3 +280,5 @@ export default function TrendsPage() {
     </div>
   );
 }
+
+    

@@ -50,8 +50,8 @@ export default function SalesPage() {
         if(productToAdd.stock === 0) {
             toast({
                 variant: "destructive",
-                title: "Out of Stock",
-                description: `${productToAdd.name} is out of stock.`,
+                title: t.outOfStock,
+                description: `${t[productToAdd.name as keyof typeof t] || productToAdd.name} ${t['is out of stock.']}`,
             });
             return;
         }
@@ -64,8 +64,8 @@ export default function SalesPage() {
             } else {
                  toast({
                     variant: "destructive",
-                    title: "Stock limit reached",
-                    description: `You cannot add more ${productToAdd.name} than available in stock.`,
+                    title: t["Stock limit reached"],
+                    description: `${t['You cannot add more']} ${t[productToAdd.name as keyof typeof t] || productToAdd.name} ${t['than available in stock.']}`,
                 });
             }
         } else {
@@ -77,8 +77,8 @@ export default function SalesPage() {
     } else if (!productId) {
       toast({
         variant: "destructive",
-        title: "No more products to add",
-        description: "You have added all available products.",
+        title: t["No more products to add"],
+        description: t["You have added all available products."],
       });
     }
   };
@@ -106,8 +106,8 @@ export default function SalesPage() {
         } else if (product && quantity > product.stock) {
             toast({
                 variant: "destructive",
-                title: "Stock limit reached",
-                description: `You cannot add more ${product.name} than available in stock.`,
+                title: t["Stock limit reached"],
+                description: `${t['You cannot add more']} ${t[product.name as keyof typeof t] || product.name} ${t['than available in stock.']}`,
             });
             itemToUpdate.quantity = product.stock;
         }
@@ -129,8 +129,8 @@ export default function SalesPage() {
     if (newSaleItems.length === 0) {
         toast({
             variant: "destructive",
-            title: "Cannot record sale",
-            description: "Please add items to the sale first.",
+            title: t["Cannot record sale"],
+            description: t["Please add items to the sale first."],
         });
         return;
     }
@@ -149,8 +149,8 @@ export default function SalesPage() {
     addSale(newSale);
     
     toast({
-      title: "Sale Recorded!",
-      description: `Your sale of ₹${newSaleTotal.toFixed(2)} has been saved.`,
+      title: t["Sale Recorded!"],
+      description: `${t['Your sale of']} ₹${newSaleTotal.toFixed(2)} ${t['has been saved.']}`,
     });
 
     setNewSaleItems([]);
@@ -166,7 +166,7 @@ export default function SalesPage() {
                 <div>
                   <CardTitle>{t.recordSale}</CardTitle>
                   <CardDescription>
-                      Add products to create a new sale.
+                      {t['Add products to create a new sale.']}
                   </CardDescription>
                 </div>
               </div>
@@ -186,8 +186,8 @@ export default function SalesPage() {
                             className="w-[250px] justify-between"
                           >
                             {item.productId
-                              ? products.find((p) => p.id === item.productId)?.name
-                              : "Select a product"}
+                              ? t[products.find((p) => p.id === item.productId)?.name as keyof typeof t] || products.find((p) => p.id === item.productId)?.name
+                              : t["Select a product"]}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
                         </PopoverTrigger>
@@ -218,7 +218,7 @@ export default function SalesPage() {
                                       item.productId === p.id ? "opacity-100" : "opacity-0"
                                     )}
                                   />
-                                  {p.name}
+                                  {t[p.name as keyof typeof t] || p.name}
                                 </Button>
                               );
                             })}
@@ -266,3 +266,5 @@ export default function SalesPage() {
     </div>
   );
 }
+
+    

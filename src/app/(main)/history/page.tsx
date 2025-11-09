@@ -63,7 +63,7 @@ export default function HistoryPage() {
           <CardHeader>
             <CardTitle>{t.salesHistory}</CardTitle>
             <CardDescription>
-              Review your past sales transactions.
+              {t['Review your past sales transactions.']}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -109,7 +109,7 @@ export default function HistoryPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[100px] sm:w-auto">{t.date}</TableHead>
-                  <TableHead>Products</TableHead>
+                  <TableHead>{t.Products}</TableHead>
                   <TableHead className="text-right">{t.total}</TableHead>
                 </TableRow>
               </TableHeader>
@@ -121,7 +121,7 @@ export default function HistoryPage() {
                     <TableCell>
                       {sale.items.map(item => {
                         const product = products.find(p => p.id === item.productId);
-                        return <div key={item.productId}>{product?.name || 'Unknown'} x {item.quantity} {product?.unit}</div>
+                        return <div key={item.productId}>{(product ? (t[product.name as keyof typeof t] || product.name) : t.Unknown)} x {item.quantity} {product?.unit}</div>
                       })}
                     </TableCell>
                     <TableCell className="text-right">₹{sale.total.toFixed(2)}</TableCell>
@@ -135,3 +135,5 @@ export default function HistoryPage() {
     </div>
   );
 }
+
+    

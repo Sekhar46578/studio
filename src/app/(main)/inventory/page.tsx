@@ -132,7 +132,7 @@ export default function InventoryPage() {
               <div>
                 <CardTitle>{t.inventoryOverview}</CardTitle>
                 <CardDescription>
-                  Monitor and manage your product stock levels.
+                  {t['Monitor and manage your product stock levels.']}
                 </CardDescription>
               </div>
               <Dialog open={isAddDialogOpen} onOpenChange={setAddDialogOpen}>
@@ -148,7 +148,7 @@ export default function InventoryPage() {
                   <DialogHeader>
                     <DialogTitle>{t.addNewProduct}</DialogTitle>
                     <DialogDescription>
-                      Fill in the details to add a new product to your inventory.
+                      {t['Fill in the details to add a new product to your inventory.']}
                     </DialogDescription>
                   </DialogHeader>
                   <form onSubmit={handleAddProduct}>
@@ -179,8 +179,8 @@ export default function InventoryPage() {
                           <Input id="category" name="category" className="col-span-3" required />
                         </div>
                          <div className="grid grid-cols-4 items-center gap-4">
-                          <Label htmlFor="unit" className="text-right">Unit</Label>
-                          <Input id="unit" name="unit" placeholder="e.g., kg, liter, piece" className="col-span-3" />
+                          <Label htmlFor="unit" className="text-right">{t.Unit}</Label>
+                          <Input id="unit" name="unit" placeholder={t['e.g., kg, liter, piece']} className="col-span-3" />
                         </div>
                       </div>
                     </ScrollArea>
@@ -197,13 +197,13 @@ export default function InventoryPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="hidden w-[100px] sm:table-cell">Image</TableHead>
+                  <TableHead className="hidden w-[100px] sm:table-cell">{t.Image}</TableHead>
                   <TableHead>{t.productName}</TableHead>
                   <TableHead>{t.stock}</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>{t.Status}</TableHead>
                   <TableHead className="hidden md:table-cell">{t.price}</TableHead>
                   <TableHead>
-                    <span className="sr-only">Actions</span>
+                    <span className="sr-only">{t.Actions}</span>
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -212,7 +212,7 @@ export default function InventoryPage() {
                   <TableRow key={product.id}>
                      <TableCell className="hidden sm:table-cell">
                       <Image
-                        alt={product.name}
+                        alt={t[product.name as keyof typeof t] || product.name}
                         className="aspect-square rounded-md object-cover"
                         height="64"
                         src={product.imageUrl}
@@ -220,7 +220,7 @@ export default function InventoryPage() {
                         data-ai-hint="product image"
                       />
                     </TableCell>
-                    <TableCell className="font-medium">{product.name}</TableCell>
+                    <TableCell className="font-medium">{t[product.name as keyof typeof t] || product.name}</TableCell>
                     <TableCell>{product.stock} {product.unit}</TableCell>
                     <TableCell>{getStockStatus(product.stock, product.lowStockThreshold)}</TableCell>
                     <TableCell className="hidden md:table-cell">₹{product.price.toFixed(2)}</TableCell>
@@ -229,13 +229,13 @@ export default function InventoryPage() {
                         <DropdownMenuTrigger asChild>
                           <Button aria-haspopup="true" size="icon" variant="ghost">
                             <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Toggle menu</span>
+                            <span className="sr-only">{t['Toggle menu']}</span>
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem onSelect={() => { setEditingProduct(product); setEditDialogOpen(true); }}>Edit</DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => { setDeletingProduct(product); setDeleteDialogOpen(true); }}>Delete</DropdownMenuItem>
+                          <DropdownMenuLabel>{t.Actions}</DropdownMenuLabel>
+                          <DropdownMenuItem onSelect={() => { setEditingProduct(product); setEditDialogOpen(true); }}>{t.Edit}</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => { setDeletingProduct(product); setDeleteDialogOpen(true); }}>{t.Delete}</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -249,16 +249,16 @@ export default function InventoryPage() {
         <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Edit Product</DialogTitle>
+                    <DialogTitle>{t['Edit Product']}</DialogTitle>
                     <DialogDescription>
-                        Update the details of your product.
+                        {t['Update the details of your product.']}
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleEditProduct}>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="edit-name" className="text-right">{t.productName}</Label>
-                            <Input id="edit-name" name="name" defaultValue={editingProduct?.name} className="col-span-3" required />
+                            <Input id="edit-name" name="name" defaultValue={editingProduct ? (t[editingProduct.name as keyof typeof t] || editingProduct.name) : ''} className="col-span-3" required />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="edit-price" className="text-right">{t.price}</Label>
@@ -271,7 +271,7 @@ export default function InventoryPage() {
                     </div>
                     <DialogFooter>
                         <Button type="button" variant="outline" onClick={() => setEditDialogOpen(false)}>{t.cancel}</Button>
-                        <Button type="submit">Save Changes</Button>
+                        <Button type="submit">{t['Save Changes']}</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
@@ -280,16 +280,15 @@ export default function InventoryPage() {
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogTitle>{t['Are you sure?']}</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the
-                product "{deletingProduct?.name}".
+                {t['This action cannot be undone. This will permanently delete the product']} &quot;{deletingProduct ? (t[deletingProduct.name as keyof typeof t] || deletingProduct.name) : ''}&quot;.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
               <AlertDialogAction onClick={handleDeleteProduct}>
-                Continue
+                {t.Continue}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -299,3 +298,5 @@ export default function InventoryPage() {
     </div>
   );
 }
+
+    

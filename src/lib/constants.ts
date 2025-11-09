@@ -4,8 +4,8 @@ import type { Product, Sale } from '@/lib/types';
 export const INITIAL_PRODUCTS: Product[] = [
   {
     id: 'prod_1',
-    name: 'Basmati Rice',
-    description: 'Premium quality long-grain Basmati rice.',
+    name: 'product.rice.name',
+    description: 'product.rice.description',
     price: 150,
     stock: 50,
     lowStockThreshold: 10,
@@ -15,8 +15,8 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'prod_2',
-    name: 'Toor Dal',
-    description: 'Split pigeon peas, a staple in Indian cooking.',
+    name: 'product.lentils.name',
+    description: 'product.lentils.description',
     price: 120,
     stock: 45,
     lowStockThreshold: 15,
@@ -26,8 +26,8 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'prod_3',
-    name: 'Atta Flour',
-    description: 'Whole wheat flour for making rotis and chapatis.',
+    name: 'product.flour.name',
+    description: 'product.flour.description',
     price: 50,
     stock: 80,
     lowStockThreshold: 20,
@@ -37,8 +37,8 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'prod_4',
-    name: 'Sunflower Oil',
-    description: 'Refined sunflower oil for daily cooking.',
+    name: 'product.oil.name',
+    description: 'product.oil.description',
     price: 180,
     stock: 30,
     lowStockThreshold: 10,
@@ -48,8 +48,8 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'prod_5',
-    name: 'Turmeric Powder',
-    description: 'Pure Haldi powder with high curcumin content.',
+    name: 'product.turmeric.name',
+    description: 'product.turmeric.description',
     price: 40,
     stock: 100,
     lowStockThreshold: 30,
@@ -59,8 +59,8 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'prod_6',
-    name: 'Cumin Seeds',
-    description: 'Whole Jeera seeds for tempering and flavor.',
+    name: 'product.cumin.name',
+    description: 'product.cumin.description',
     price: 60,
     stock: 70,
     lowStockThreshold: 25,
@@ -70,8 +70,8 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'prod_7',
-    name: 'White Sugar',
-    description: 'Refined crystal sugar.',
+    name: 'product.sugar.name',
+    description: 'product.sugar.description',
     price: 45,
     stock: 120,
     lowStockThreshold: 40,
@@ -81,8 +81,8 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'prod_8',
-    name: 'Tata Tea Gold',
-    description: 'A blend of fine tea leaves for a rich taste.',
+    name: 'product.tea.name',
+    description: 'product.tea.description',
     price: 250,
     stock: 40,
     lowStockThreshold: 10,
@@ -92,8 +92,8 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'prod_9',
-    name: 'Amul Ghee',
-    description: 'Pure cow ghee with a rich aroma.',
+    name: 'product.ghee.name',
+    description: 'product.ghee.description',
     price: 550,
     stock: 25,
     lowStockThreshold: 5,
@@ -103,8 +103,8 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'prod_10',
-    name: 'Onions',
-    description: 'Fresh red onions, 1kg.',
+    name: 'product.onions.name',
+    description: 'product.onions.description',
     price: 30,
     stock: 90,
     lowStockThreshold: 20,
@@ -114,8 +114,8 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'prod_11',
-    name: 'Potatoes',
-    description: 'Fresh farm potatoes, 1kg.',
+    name: 'product.potatoes.name',
+    description: 'product.potatoes.description',
     price: 25,
     stock: 150,
     lowStockThreshold: 30,
@@ -125,8 +125,8 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'prod_12',
-    name: 'Tomatoes',
-    description: 'Fresh ripe tomatoes, 1kg.',
+    name: 'product.tomatoes.name',
+    description: 'product.tomatoes.description',
     price: 40,
     stock: 60,
     lowStockThreshold: 15,
@@ -136,8 +136,8 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'prod_13',
-    name: 'Parle-G Biscuits',
-    description: 'Classic glucose biscuits, pack of 10.',
+    name: 'product.biscuits.name',
+    description: 'product.biscuits.description',
     price: 50,
     stock: 200,
     lowStockThreshold: 50,
@@ -147,8 +147,8 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'prod_14',
-    name: 'Lays Classic Salted',
-    description: 'Crispy potato chips, classic salted flavor.',
+    name: 'product.chips.name',
+    description: 'product.chips.description',
     price: 20,
     stock: 150,
     lowStockThreshold: 40,
@@ -158,8 +158,8 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'prod_15',
-    name: 'Coca-Cola',
-    description: '500ml bottle of Coca-Cola.',
+    name: 'product.cola.name',
+    description: 'product.cola.description',
     price: 40,
     stock: 100,
     lowStockThreshold: 25,
@@ -169,8 +169,8 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'prod_16',
-    name: 'Cadbury Dairy Milk',
-    description: 'Classic milk chocolate bar.',
+    name: 'product.chocolate.name',
+    description: 'product.chocolate.description',
     price: 45,
     stock: 180,
     lowStockThreshold: 60,
@@ -226,3 +226,5 @@ export const MOCK_SALES: Sale[] = [
     }
   ];
   
+
+    
