@@ -104,10 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        await seedInitialData(firebaseUser.uid);
-      }
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
     });
@@ -129,10 +126,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await updateProfile(userCredential.user, { displayName: name });
       
       const userDocRef = doc(firestore, 'users', userCredential.user.uid);
+      // Set initialized to true so they don't get seed data on next login
       setDocumentNonBlocking(userDocRef, {
         name: name,
         email: email,
         createdAt: new Date().toISOString(),
+        initialized: true 
       }, { merge: true });
 
       return true;
@@ -148,7 +147,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      // Seed data only on login
+      await seedInitialData(userCredential.user.uid);
       return true;
     } catch (error: any) {
       toast({
