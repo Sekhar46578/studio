@@ -1,7 +1,7 @@
 
 import { create, useStore } from 'zustand';
 import type { User } from 'firebase/auth';
-import { createContext, useContext, useRef, type ReactNode, useEffect, useState } from 'react';
+import { createContext, useContext, useRef, type ReactNode, useEffect, useState, useMemo } from 'react';
 import type { StoreApi } from 'zustand';
 import {
   collection,
@@ -69,15 +69,12 @@ const AppStoreContext = createContext<StoreApi<AppState> | null>(null);
 
 export const ProductStoreProvider = ({ children, user }: { children: ReactNode; user: User | null }) => {
   const { firestore } = useFirebase();
-  const [store, setStore] = useState<StoreApi<AppState> | null>(null);
 
-  useEffect(() => {
+  const store = useMemo(() => {
     if (user && firestore) {
-      const newStore = createAppStore(user.uid, firestore);
-      setStore(newStore);
-    } else {
-      setStore(null);
+      return createAppStore(user.uid, firestore);
     }
+    return null;
   }, [user, firestore]);
   
   if (!user || !store) {
