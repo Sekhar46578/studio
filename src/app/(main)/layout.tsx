@@ -44,8 +44,8 @@ export default function MainLayout({
           <SidebarHeader>
             <Link href="/" className="flex items-center gap-2">
               <Logo className="h-7 w-7 text-primary" />
-              <span className="text-lg font-semibold text-sidebar-foreground">
-                ShopStock
+              <span className="text-sm font-semibold text-sidebar-foreground">
+                Inventory & Sales Tracker
               </span>
             </Link>
           </SidebarHeader>

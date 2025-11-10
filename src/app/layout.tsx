@@ -6,8 +6,8 @@ import { AuthProvider } from '@/components/auth-provider';
 import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'ShopStock',
-  description: 'Inventory management for your shop',
+  title: 'Inventory & Sales Tracker',
+  description: 'An app to track your inventory and sales.',
 };
 
 export default function RootLayout({
