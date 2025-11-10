@@ -19,6 +19,7 @@ import { Skeleton } from './ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { INITIAL_PRODUCTS } from '@/lib/constants';
+import { subDays } from 'date-fns';
 
 interface AuthContextType {
   user: FirebaseUser | null;
@@ -71,14 +72,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Seed initial data for new user
       const productsCollection = collection(firestore, 'users', userCredential.user.uid, 'products');
+      const salesCollection = collection(firestore, 'users', userCredential.user.uid, 'sales');
       const batch = writeBatch(firestore);
-      INITIAL_PRODUCTS.forEach(product => {
-          const newDocRef = doc(productsCollection);
-          batch.set(newDocRef, {
-              ...product,
-              id: newDocRef.id // ensure id is part of the doc data
-          });
+
+      const productDocs = INITIAL_PRODUCTS.map(product => {
+        const newDocRef = doc(productsCollection);
+        const productWithId = { ...product, id: newDocRef.id };
+        batch.set(newDocRef, productWithId);
+        return productWithId;
       });
+      
+      // Seed some random sales for the last 7 days
+      for (let i = 0; i < 7; i++) {
+        const numSales = Math.floor(Math.random() * 3); // 0 to 2 sales per day
+        for (let j = 0; j < numSales; j++) {
+            const saleDate = subDays(new Date(), i);
+            const saleDocRef = doc(salesCollection);
+            const numItems = Math.floor(Math.random() * 3) + 1; // 1 to 3 items per sale
+            const saleItems = [];
+            let saleTotal = 0;
+            const usedProductIndices = new Set();
+
+            for (let k = 0; k < numItems; k++) {
+                let productIndex = Math.floor(Math.random() * productDocs.length);
+                while(usedProductIndices.has(productIndex)) {
+                    productIndex = Math.floor(Math.random() * productDocs.length);
+                }
+                usedProductIndices.add(productIndex);
+
+                const product = productDocs[productIndex];
+                const quantity = Math.floor(Math.random() * 3) + 1; // 1 to 3 quantity
+                
+                saleItems.push({
+                    productId: product.id,
+                    quantity: quantity,
+                    priceAtSale: product.price,
+                });
+                saleTotal += product.price * quantity;
+            }
+
+            batch.set(saleDocRef, {
+                id: saleDocRef.id,
+                date: saleDate.toISOString(),
+                items: saleItems,
+                total: saleTotal,
+            });
+        }
+      }
+
       await batch.commit();
 
 
