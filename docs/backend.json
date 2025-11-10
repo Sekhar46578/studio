@@ -1,0 +1,175 @@
+{
+  "entities": {
+    "Product": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Product",
+      "type": "object",
+      "description": "Represents a product in the inventory.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the product."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the product."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the product."
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the product."
+        },
+        "initialStock": {
+          "type": "number",
+          "description": "Initial stock level of the product."
+        },
+        "currentStock": {
+          "type": "number",
+          "description": "Current stock level of the product."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "price",
+        "initialStock",
+        "currentStock"
+      ]
+    },
+    "SalesTransaction": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SalesTransaction",
+      "type": "object",
+      "description": "Represents a sales transaction.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the sales transaction."
+        },
+        "productId": {
+          "type": "string",
+          "description": "Reference to Product. (Relationship: Product 1:N SalesTransaction)"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "Quantity of the product sold in this transaction."
+        },
+        "saleDate": {
+          "type": "string",
+          "description": "Date of the sale.",
+          "format": "date-time"
+        },
+        "totalAmount": {
+          "type": "number",
+          "description": "The total amount of the transaction."
+        }
+      },
+      "required": [
+        "id",
+        "productId",
+        "quantity",
+        "saleDate",
+        "totalAmount"
+      ]
+    },
+    "StockAdjustment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "StockAdjustment",
+      "type": "object",
+      "description": "Represents an adjustment to the stock level of a product.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the stock adjustment."
+        },
+        "productId": {
+          "type": "string",
+          "description": "Reference to Product. (Relationship: Product 1:N StockAdjustment)"
+        },
+        "adjustmentQuantity": {
+          "type": "number",
+          "description": "The amount by which the stock level was adjusted. Positive values indicate additions, negative indicate reductions."
+        },
+        "adjustmentDate": {
+          "type": "string",
+          "description": "Date of the stock adjustment.",
+          "format": "date-time"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Reason for the stock adjustment."
+        }
+      },
+      "required": [
+        "id",
+        "productId",
+        "adjustmentQuantity",
+        "adjustmentDate",
+        "reason"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/products/{productId}",
+        "definition": {
+          "entityName": "Product",
+          "schema": {
+            "$ref": "#/backend/entities/Product"
+          },
+          "description": "Stores product information. Each product has a unique ID.  Authorization is managed at the application level to restrict unauthorized modifications. Includes productId for easier references.",
+          "params": [
+            {
+              "name": "productId",
+              "description": "Unique identifier for the product."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/sales_transactions/{salesTransactionId}",
+        "definition": {
+          "entityName": "SalesTransaction",
+          "schema": {
+            "$ref": "#/backend/entities/SalesTransaction"
+          },
+          "description": "Stores sales transaction records. Includes a productId field to reference the associated product. Authorization is managed at the application level to restrict unauthorized modifications.",
+          "params": [
+            {
+              "name": "salesTransactionId",
+              "description": "Unique identifier for the sales transaction."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/stock_adjustments/{stockAdjustmentId}",
+        "definition": {
+          "entityName": "StockAdjustment",
+          "schema": {
+            "$ref": "#/backend/entities/StockAdjustment"
+          },
+          "description": "Stores stock adjustment records. Includes a productId field to reference the associated product. Authorization is managed at the application level to restrict unauthorized modifications.",
+          "params": [
+            {
+              "name": "stockAdjustmentId",
+              "description": "Unique identifier for the stock adjustment."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to provide a secure, scalable, and easily maintainable database for the ShopStock application. The structure prioritizes authorization independence by avoiding hierarchical dependencies and denormalizing authorization data. This approach simplifies security rules and enables atomic operations. The data is segregated into collections based on entity type (products, sales transactions, stock adjustments) for clarity and predictable access patterns. User-specific data is stored in subcollections under the `/users/{userId}` path to ensure secure and isolated access to user-related information. I am not creating a user collection because the auth information is enough in this case.\n\n**Authorization Independence (CRITICAL):** SalesTransaction and StockAdjustment collections include the productId which allows to avoid `get()` calls and keep our rules independent.\n\n**QAPs:** Segregation of data into collections (products, sales_transactions, stock_adjustments) supports secure list operations as rules can be applied to each collection independently based on its specific data and access requirements.  The design avoids relying on filtering within rules, which is a core principle for QAPs."
+  }
+}
