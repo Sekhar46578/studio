@@ -34,13 +34,21 @@ import {
   Tooltip,
 } from "recharts";
 import { Product, Sale } from "@/lib/types";
+import { useCollection, useFirebase } from "@/firebase";
+import { collection } from "firebase/firestore";
 
 export default function DashboardPage() {
   const { t } = useTranslation();
-  const { products, sales } = useProductStore(state => ({ products: state.products as Product[], sales: state.sales as Sale[] }));
+  const { user, firestore } = useFirebase();
+
+  const productsRef = useMemo(() => user ? collection(firestore, 'users', user.uid, 'products') : null, [user, firestore]);
+  const { data: products } = useCollection<Product>(productsRef);
+
+  const salesRef = useMemo(() => user ? collection(firestore, 'users', user.uid, 'sales') : null, [user, firestore]);
+  const { data: sales } = useCollection<Sale>(salesRef);
 
   const todayStats = useMemo(() => {
-    if (!sales) return { totalRevenue: 0, transactions: 0, itemsSoldCount: 0, topProduct: null };
+    if (!sales || !products) return { totalRevenue: 0, transactions: 0, itemsSoldCount: 0, topProduct: null };
     const todaySales = sales.filter(sale => isToday(new Date(sale.date)));
     const totalRevenue = todaySales.reduce((acc, sale) => acc + sale.total, 0);
     const transactions = todaySales.length;

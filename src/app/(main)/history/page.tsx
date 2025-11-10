@@ -30,13 +30,20 @@ import {
 } from "@/components/ui/popover";
 import { useTranslation } from "@/lib/hooks/use-translation";
 import { cn } from "@/lib/utils";
-import { useProductStore } from "@/store/products";
-import { Product } from "@/lib/types";
+import { Product, Sale } from "@/lib/types";
+import { useCollection, useFirebase } from "@/firebase";
+import { collection } from "firebase/firestore";
 
 export default function HistoryPage() {
   const { t } = useTranslation();
-  const { products, sales } = useProductStore(state => ({ products: state.products as Product[], sales: state.sales as any[] }));
+  const { user, firestore } = useFirebase();
   
+  const productsRef = useMemo(() => user ? collection(firestore, 'users', user.uid, 'products') : null, [user, firestore]);
+  const { data: products, isLoading: isLoadingProducts } = useCollection<Product>(productsRef);
+
+  const salesRef = useMemo(() => user ? collection(firestore, 'users', user.uid, 'sales') : null, [user, firestore]);
+  const { data: sales, isLoading: isLoadingSales } = useCollection<Sale>(salesRef);
+
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
     to: new Date(),
@@ -116,13 +123,18 @@ export default function HistoryPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredSales.map((sale) => (
+                {(isLoadingProducts || isLoadingSales) && (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center">Loading sales history...</TableCell>
+                  </TableRow>
+                )}
+                {!(isLoadingProducts || isLoadingSales) && filteredSales.map((sale) => (
                   <TableRow key={sale.id}>
                     <TableCell className="hidden sm:table-cell">{format(new Date(sale.date), "PPP")}</TableCell>
                     <TableCell className="sm:hidden table-cell">{format(new Date(sale.date), "MM/dd/yy")}</TableCell>
                     <TableCell>
                       {sale.items.map((item:any) => {
-                        const product = products.find(p => p.id === item.productId);
+                        const product = products?.find(p => p.id === item.productId);
                         return <div key={item.productId}>{(product ? (t[product.name as keyof typeof t] || product.name) : t.Unknown)} x {item.quantity} {product?.unit}</div>
                       })}
                     </TableCell>

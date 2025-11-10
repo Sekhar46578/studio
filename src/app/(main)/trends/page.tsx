@@ -52,10 +52,19 @@ import {
 import { isWithinInterval, startOfDay } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Product, Sale } from "@/lib/types";
+import { useCollection, useFirebase } from "@/firebase";
+import { collection } from "firebase/firestore";
 
 export default function TrendsPage() {
   const { t } = useTranslation();
-  const { products, sales } = useProductStore(state => ({ products: state.products as Product[], sales: state.sales as Sale[] }));
+  const { user, firestore } = useFirebase();
+
+  const productsRef = useMemo(() => user ? collection(firestore, 'users', user.uid, 'products') : null, [user, firestore]);
+  const { data: products } = useCollection<Product>(productsRef);
+
+  const salesRef = useMemo(() => user ? collection(firestore, 'users', user.uid, 'sales') : null, [user, firestore]);
+  const { data: sales } = useCollection<Sale>(salesRef);
+  
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
     to: new Date(),

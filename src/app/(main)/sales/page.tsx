@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Plus, Minus, PlusCircle, Trash2, ChevronsUpDown, Check } from "lucide-react";
 import { Header } from "@/components/header";
 import {
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { SaleItem } from "@/lib/types";
+import type { SaleItem, Product } from "@/lib/types";
 import { useTranslation } from "@/lib/hooks/use-translation";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -25,16 +25,25 @@ import {
 import { useProductStore } from "@/store/products";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useCollection, useFirebase } from "@/firebase";
+import { collection } from "firebase/firestore";
 
 export default function SalesPage() {
   const { t } = useTranslation();
-  const { products, addSale } = useProductStore(state => ({ products: state.products, addSale: state.addSale }));
+  const { addSale } = useProductStore();
+  const { user, firestore } = useFirebase();
+
+  const productsRef = useMemo(() => user ? collection(firestore, 'users', user.uid, 'products') : null, [user, firestore]);
+  const { data: products, isLoading } = useCollection<Product>(productsRef);
+  
   const [newSaleItems, setNewSaleItems] = useState<SaleItem[]>([]);
   const { toast } = useToast();
   
   const [openPopoverIndex, setOpenPopoverIndex] = useState<number | null>(null);
 
   const addSaleItem = (productId?: string) => {
+    if (!products) return;
+
     const availableProducts = products.filter(
       p => !newSaleItems.some(item => item.productId === p.id) && p.stock > 0
     );
@@ -82,6 +91,7 @@ export default function SalesPage() {
   };
 
   const updateSaleItem = (index: number, field: keyof SaleItem, value: string | number) => {
+    if (!products) return;
     const items = [...newSaleItems];
     const itemToUpdate = { ...items[index] };
     const product = products.find(p => p.id === itemToUpdate.productId);
@@ -164,7 +174,7 @@ export default function SalesPage() {
             <CardContent>
             <div className="space-y-4">
                 {newSaleItems.map((item, index) => {
-                  const product = products.find(p => p.id === item.productId);
+                  const product = products?.find(p => p.id === item.productId);
                   return (
                     <div key={index} className="flex items-center gap-2 sm:gap-4">
                        <Popover open={openPopoverIndex === index} onOpenChange={(isOpen) => setOpenPopoverIndex(isOpen ? index : null)}>
@@ -175,7 +185,7 @@ export default function SalesPage() {
                             aria-expanded={openPopoverIndex === index}
                             className="w-[250px] justify-between"
                           >
-                            {item.productId
+                            {item.productId && products
                               ? t[products.find((p) => p.id === item.productId)?.name as keyof typeof t] || products.find((p) => p.id === item.productId)?.name
                               : t["Select a product"]}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -184,7 +194,7 @@ export default function SalesPage() {
                         <PopoverContent className="w-[250px] p-0">
                           <ScrollArea className="h-72">
                             <div className="p-1">
-                            {products.map((p) => {
+                            {products?.map((p) => {
                               const isAlreadySelected = newSaleItems.some(
                                 (saleItem) => saleItem.productId === p.id && item.productId !== p.id
                               );
@@ -241,7 +251,7 @@ export default function SalesPage() {
                     </div>
                   );
                 })}
-                <Button variant="outline" onClick={() => addSaleItem()} className="w-full">
+                <Button variant="outline" onClick={() => addSaleItem()} className="w-full" disabled={isLoading}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 {t.addToSale}
                 </Button>

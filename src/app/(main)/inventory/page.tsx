@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Header } from "@/components/header";
 import {
   Card,
@@ -54,15 +55,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useCollection, useFirebase } from "@/firebase";
+import { collection } from "firebase/firestore";
 
 export default function InventoryPage() {
   const { t } = useTranslation();
-  const { products, addProduct, updateProduct, deleteProduct } = useProductStore(state => ({
-    products: state.products,
-    addProduct: state.addProduct,
-    updateProduct: state.updateProduct,
-    deleteProduct: state.deleteProduct,
-  }));
+  const { addProduct, updateProduct, deleteProduct } = useProductStore();
+  const { user, firestore } = useFirebase();
+
+  const productsRef = useMemo(() => user ? collection(firestore, 'users', user.uid, 'products') : null, [user, firestore]);
+  const { data: products, isLoading } = useCollection<Product>(productsRef);
 
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
@@ -208,7 +210,12 @@ export default function InventoryPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {products.map((product) => (
+                {isLoading && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center">Loading products...</TableCell>
+                  </TableRow>
+                )}
+                {!isLoading && products?.map((product) => (
                   <TableRow key={product.id}>
                      <TableCell className="hidden sm:table-cell">
                       <Image

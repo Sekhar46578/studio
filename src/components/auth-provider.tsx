@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useContext, ReactNode, useEffect } from 'react';
@@ -7,15 +8,17 @@ import {
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
+  onAuthStateChanged,
 } from 'firebase/auth';
 import type { User as FirebaseUser } from 'firebase/auth';
-import { useAuth as useFirebaseAuth, useFirestore } from '@/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { useFirebase } from '@/firebase';
+import { collection, doc, setDoc, writeBatch, getDoc } from 'firebase/firestore';
 
 import { ProductStoreProvider } from '@/store/products.tsx';
 import { Skeleton } from './ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { INITIAL_PRODUCTS } from '@/lib/constants';
 
 interface AuthContextType {
   user: FirebaseUser | null;
@@ -26,14 +29,25 @@ interface AuthContextType {
   updateUser: (name: string, picture?: string) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { user, isUserLoading: loading, auth } = useFirebaseAuth();
-  const firestore = useFirestore();
+  const { auth, firestore } = useFirebase();
+  const [user, setUser] = React.useState<FirebaseUser | null>(null);
+  const [loading, setLoading] = React.useState(true);
   const router = useRouter();
   const pathname = usePathname();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [auth]);
+
 
   useEffect(() => {
     if (!loading && !user && !['/login', '/signup'].includes(pathname)) {
@@ -52,7 +66,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         name: name,
         email: email,
         createdAt: new Date().toISOString(),
+        initialized: true,
       }, { merge: true });
+
+      // Seed initial data for new user
+      const productsCollection = collection(firestore, 'users', userCredential.user.uid, 'products');
+      const batch = writeBatch(firestore);
+      INITIAL_PRODUCTS.forEach(product => {
+          const newDocRef = doc(productsCollection);
+          batch.set(newDocRef, {
+              ...product,
+              id: newDocRef.id // ensure id is part of the doc data
+          });
+      });
+      await batch.commit();
+
 
       return true;
     } catch (error: any) {
