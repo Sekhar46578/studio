@@ -55,7 +55,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useCollection, useFirebase } from "@/firebase";
+import { useCollection, useFirebase, useMemoFirebase } from "@/firebase";
 import { collection } from "firebase/firestore";
 
 export default function InventoryPage() {
@@ -63,7 +63,7 @@ export default function InventoryPage() {
   const { addProduct, updateProduct, deleteProduct } = useProductStore();
   const { user, firestore } = useFirebase();
 
-  const productsRef = useMemo(() => user ? collection(firestore, 'users', user.uid, 'products') : null, [user, firestore]);
+  const productsRef = useMemoFirebase(() => user ? collection(firestore, 'users', user.uid, 'products') : null, [user, firestore]);
   const { data: products, isLoading } = useCollection<Product>(productsRef);
 
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);

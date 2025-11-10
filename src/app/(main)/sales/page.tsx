@@ -25,7 +25,7 @@ import {
 import { useProductStore } from "@/store/products";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useCollection, useFirebase } from "@/firebase";
+import { useCollection, useFirebase, useMemoFirebase } from "@/firebase";
 import { collection } from "firebase/firestore";
 
 export default function SalesPage() {
@@ -33,7 +33,7 @@ export default function SalesPage() {
   const { addSale } = useProductStore();
   const { user, firestore } = useFirebase();
 
-  const productsRef = useMemo(() => user ? collection(firestore, 'users', user.uid, 'products') : null, [user, firestore]);
+  const productsRef = useMemoFirebase(() => user ? collection(firestore, 'users', user.uid, 'products') : null, [user, firestore]);
   const { data: products, isLoading } = useCollection<Product>(productsRef);
   
   const [newSaleItems, setNewSaleItems] = useState<SaleItem[]>([]);
@@ -146,7 +146,7 @@ export default function SalesPage() {
     addSale({
       items: newSaleItems,
       total: newSaleTotal
-    });
+    }, products || []);
     
     toast({
       title: t["Sale Recorded!"],

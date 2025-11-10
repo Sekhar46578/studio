@@ -31,17 +31,17 @@ import {
 import { useTranslation } from "@/lib/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { Product, Sale } from "@/lib/types";
-import { useCollection, useFirebase } from "@/firebase";
+import { useCollection, useFirebase, useMemoFirebase } from "@/firebase";
 import { collection } from "firebase/firestore";
 
 export default function HistoryPage() {
   const { t } = useTranslation();
   const { user, firestore } = useFirebase();
   
-  const productsRef = useMemo(() => user ? collection(firestore, 'users', user.uid, 'products') : null, [user, firestore]);
+  const productsRef = useMemoFirebase(() => user ? collection(firestore, 'users', user.uid, 'products') : null, [user, firestore]);
   const { data: products, isLoading: isLoadingProducts } = useCollection<Product>(productsRef);
 
-  const salesRef = useMemo(() => user ? collection(firestore, 'users', user.uid, 'sales') : null, [user, firestore]);
+  const salesRef = useMemoFirebase(() => user ? collection(firestore, 'users', user.uid, 'sales') : null, [user, firestore]);
   const { data: sales, isLoading: isLoadingSales } = useCollection<Sale>(salesRef);
 
   const [date, setDate] = useState<DateRange | undefined>({
