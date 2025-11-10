@@ -33,12 +33,14 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
+import { Product, Sale } from "@/lib/types";
 
 export default function DashboardPage() {
   const { t } = useTranslation();
-  const { products, sales } = useProductStore() as { products: any[], sales: any[]};
+  const { products, sales } = useProductStore(state => ({ products: state.products as Product[], sales: state.sales as Sale[] }));
 
   const todayStats = useMemo(() => {
+    if (!sales) return { totalRevenue: 0, transactions: 0, itemsSoldCount: 0, topProduct: null };
     const todaySales = sales.filter(sale => isToday(new Date(sale.date)));
     const totalRevenue = todaySales.reduce((acc, sale) => acc + sale.total, 0);
     const transactions = todaySales.length;
@@ -58,6 +60,7 @@ export default function DashboardPage() {
   }, [sales, products]);
 
   const quickStats = useMemo(() => {
+    if (!products) return { lowStockCount: 0 };
     const lowStockCount = products.filter(
       (p) => p.stock <= p.lowStockThreshold
     ).length;
@@ -65,6 +68,7 @@ export default function DashboardPage() {
   }, [products]);
 
   const last7DaysSales = useMemo(() => {
+    if (!sales) return [];
     const today = new Date();
     const last7Days = Array.from({ length: 7 }).map((_, i) => {
       const date = subDays(today, i);
@@ -206,5 +210,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    

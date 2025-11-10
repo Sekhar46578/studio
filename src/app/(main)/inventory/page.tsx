@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -58,10 +57,12 @@ import {
 
 export default function InventoryPage() {
   const { t } = useTranslation();
-  const products = useProductStore((state) => state.products) as Product[];
-  const addProduct = useProductStore((state) => state.addProduct) as (product: Product) => void;
-  const updateProduct = useProductStore((state) => state.updateProduct) as (product: Product) => void;
-  const deleteProduct = useProductStore((state) => state.deleteProduct) as (productId: string) => void;
+  const { products, addProduct, updateProduct, deleteProduct } = useProductStore(state => ({
+    products: state.products,
+    addProduct: state.addProduct,
+    updateProduct: state.updateProduct,
+    deleteProduct: state.deleteProduct,
+  }));
 
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
@@ -82,8 +83,7 @@ export default function InventoryPage() {
   const handleAddProduct = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const newProduct: Product = {
-      id: `prod_${Date.now()}`,
+    const newProduct = {
       name: formData.get("name") as string,
       description: formData.get("description") as string,
       price: Number(formData.get("price")),
@@ -298,5 +298,3 @@ export default function InventoryPage() {
     </div>
   );
 }
-
-    

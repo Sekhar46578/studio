@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth-provider';
 import { Header } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -8,23 +8,28 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from '@/lib/hooks/use-translation';
-import type { User } from '@/lib/types';
 
 export default function ProfilePage() {
   const { user, updateUser } = useAuth();
   const { t } = useTranslation();
-  const { toast } = useToast();
 
-  const [name, setName] = useState(user?.name || '');
-  const [picture, setPicture] = useState(user?.picture || '');
+  const [name, setName] = useState(user?.displayName || '');
+  const [picture, setPicture] = useState(user?.photoURL || '');
+
+  useEffect(() => {
+    if (user) {
+      setName(user.displayName || '');
+      setPicture(user.photoURL || '');
+    }
+  }, [user]);
 
   if (!user) {
     return null;
   }
 
-  const getInitials = (name: string) => {
+  const getInitials = (name: string | null) => {
+    if (!name) return '';
     return name.split(" ").map((n) => n[0]).join("");
   };
 
@@ -40,16 +45,7 @@ export default function ProfilePage() {
   };
 
   const handleSaveChanges = () => {
-    const updatedUser: User = {
-      ...user,
-      name,
-      picture,
-    };
-    updateUser(updatedUser);
-    toast({
-      title: "Profile Updated",
-      description: "Your changes have been saved.",
-    });
+    updateUser(name, picture);
   };
 
   return (
@@ -64,8 +60,8 @@ export default function ProfilePage() {
           <CardContent className="space-y-6">
             <div className="flex items-center gap-6">
               <Avatar className="h-20 w-20">
-                <AvatarImage src={picture} alt={`@${user.name}`} />
-                <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                <AvatarImage src={picture} alt={`@${name}`} />
+                <AvatarFallback>{getInitials(name)}</AvatarFallback>
               </Avatar>
               <div>
                 <Label htmlFor="picture-upload" className="cursor-pointer">
@@ -85,7 +81,7 @@ export default function ProfilePage() {
 
             <div className="space-y-2">
               <Label htmlFor="email">{t.email}</Label>
-              <Input id="email" value={user.email} disabled />
+              <Input id="email" value={user.email || ''} disabled />
             </div>
 
             <div className="flex justify-end">

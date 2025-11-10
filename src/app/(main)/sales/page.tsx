@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { Sale, SaleItem } from "@/lib/types";
+import type { SaleItem } from "@/lib/types";
 import { useTranslation } from "@/lib/hooks/use-translation";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -28,9 +28,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function SalesPage() {
   const { t } = useTranslation();
-  const products = useProductStore((state) => state.products) as any[];
-  const decreaseStock = useProductStore((state) => state.decreaseStock) as (productId: string, quantity: number) => void;
-  const addSale = useProductStore((state) => state.addSale) as (sale: Sale) => void;
+  const { products, addSale } = useProductStore(state => ({ products: state.products, addSale: state.addSale }));
   const [newSaleItems, setNewSaleItems] = useState<SaleItem[]>([]);
   const { toast } = useToast();
   
@@ -135,18 +133,10 @@ export default function SalesPage() {
         return;
     }
 
-    const newSale: Sale = {
-      id: `sale_${Date.now()}`,
-      date: new Date().toISOString(),
+    addSale({
       items: newSaleItems,
-      total: newSaleTotal,
-    };
-    
-    newSaleItems.forEach(item => {
-        decreaseStock(item.productId, item.quantity);
+      total: newSaleTotal
     });
-
-    addSale(newSale);
     
     toast({
       title: t["Sale Recorded!"],
@@ -266,5 +256,3 @@ export default function SalesPage() {
     </div>
   );
 }
-
-    

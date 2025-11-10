@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { I18nProvider } from '@/lib/i18n-provider';
 import { AuthProvider } from '@/components/auth-provider';
 import { cn } from '@/lib/utils';
+import { FirebaseClientProvider } from '@/firebase';
 
 export const metadata: Metadata = {
   title: 'Inventory & Sales Tracker',
@@ -25,12 +26,14 @@ export default function RootLayout({
       <body className={cn(
         "min-h-screen bg-background font-body antialiased"
       )}>
-        <I18nProvider>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
-          <Toaster />
-        </I18nProvider>
+        <FirebaseClientProvider>
+          <I18nProvider>
+            <AuthProvider>
+              {children}
+            </AuthProvider>
+            <Toaster />
+          </I18nProvider>
+        </FirebaseClientProvider>
       </body>
     </html>
   );

@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/icons';
 import { useTranslation } from '@/lib/hooks/use-translation';
+import { useEffect } from 'react';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -28,7 +29,7 @@ type LoginFormValues = z.infer<typeof formSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, user, loading } = useAuth();
   const { t } = useTranslation();
   
   const form = useForm<LoginFormValues>({
@@ -38,6 +39,13 @@ export default function LoginPage() {
       password: '',
     },
   });
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.push('/');
+    }
+  }, [user, loading, router]);
+
 
   const onSubmit = async (data: LoginFormValues) => {
     const success = await login(data.email, data.password);

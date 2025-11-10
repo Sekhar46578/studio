@@ -23,9 +23,10 @@ export type Sale = {
   total: number;
 };
 
-export type User = {
-  name: string;
-  email: string;
-  picture?: string;
-  password?: string;
-};
+// This can be removed as we now use FirebaseUser
+// export type User = {
+//   name: string;
+//   email: string;
+//   picture?: string;
+//   password?: string;
+// };

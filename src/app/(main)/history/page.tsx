@@ -31,18 +31,20 @@ import {
 import { useTranslation } from "@/lib/hooks/use-translation";
 import { cn } from "@/lib/utils";
 import { useProductStore } from "@/store/products";
+import { Product } from "@/lib/types";
 
 export default function HistoryPage() {
   const { t } = useTranslation();
-  const products = useProductStore((state) => state.products) as any[];
-  const sales = useProductStore((state) => state.sales) as any[];
+  const { products, sales } = useProductStore(state => ({ products: state.products as Product[], sales: state.sales as any[] }));
+  
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
     to: new Date(),
   });
 
   const filteredSales = useMemo(() => {
-    return (sales || [])
+    if (!sales) return [];
+    return sales
       .filter(sale => {
         const saleDate = new Date(sale.date);
         if (date?.from && date?.to) {
@@ -119,7 +121,7 @@ export default function HistoryPage() {
                     <TableCell className="hidden sm:table-cell">{format(new Date(sale.date), "PPP")}</TableCell>
                     <TableCell className="sm:hidden table-cell">{format(new Date(sale.date), "MM/dd/yy")}</TableCell>
                     <TableCell>
-                      {sale.items.map(item => {
+                      {sale.items.map((item:any) => {
                         const product = products.find(p => p.id === item.productId);
                         return <div key={item.productId}>{(product ? (t[product.name as keyof typeof t] || product.name) : t.Unknown)} x {item.quantity} {product?.unit}</div>
                       })}
@@ -135,5 +137,3 @@ export default function HistoryPage() {
     </div>
   );
 }
-
-    

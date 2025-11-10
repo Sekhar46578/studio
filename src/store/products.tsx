@@ -1,111 +1,187 @@
 
 import { create, useStore } from 'zustand';
-import { Product, Sale, User } from '@/lib/types';
-import { INITIAL_PRODUCTS, MOCK_SALES } from '@/lib/constants';
+import type { User } from 'firebase/auth';
 import { createContext, useContext, useRef, type ReactNode, useEffect, useState } from 'react';
 import type { StoreApi } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import {
+  collection,
+  doc,
+  writeBatch,
+  getDocs,
+  query,
+  where,
+  getDoc,
+} from 'firebase/firestore';
+import { useFirebase } from '@/firebase';
+
+import { Product, Sale } from '@/lib/types';
+import { INITIAL_PRODUCTS, MOCK_SALES } from '@/lib/constants';
+
+import { 
+  addDocumentNonBlocking,
+  deleteDocumentNonBlocking,
+  setDocumentNonBlocking,
+  updateDocumentNonBlocking
+} from '@/firebase/non-blocking-updates';
 
 interface AppState {
   products: Product[];
   sales: Sale[];
-  addProduct: (product: Product) => void;
+  init: (products: Product[], sales: Sale[]) => void;
+  addProduct: (product: Omit<Product, 'id'>) => void;
   updateProduct: (product: Product) => void;
   deleteProduct: (productId: string) => void;
-  decreaseStock: (productId: string, quantity: number) => void;
-  addSale: (sale: Sale) => void;
+  addSale: (sale: Omit<Sale, 'id' | 'date'>) => void;
 }
 
-const createAppStore = (user: User | null) => {
-  const storageName = user ? `shopstock-storage-${user.email}` : 'shopstock-storage-guest';
-  
-  return create(
-    persist<AppState>(
-      (set) => ({
-        products: INITIAL_PRODUCTS,
-        sales: MOCK_SALES,
-        addProduct: (product) => set((state) => ({ products: [product, ...state.products] })),
-        updateProduct: (product) => set((state) => ({
-          products: state.products.map((p) => (p.id === product.id ? product : p)),
-        })),
-        deleteProduct: (productId) => set((state) => ({
-          products: state.products.filter((p) => p.id !== productId),
-        })),
-        decreaseStock: (productId, quantity) =>
-          set((state) => ({
-            products: state.products.map((p) =>
-              p.id === productId ? { ...p, stock: Math.max(0, p.stock - quantity) } : p
-            ),
-          })),
-        addSale: (sale) => set((state) => ({ sales: [sale, ...state.sales] })),
-      }),
-      {
-        name: storageName,
-        storage: createJSONStorage(() => localStorage), 
-        onRehydrateStorage: () => (state, error) => {
-          if (error) {
-            console.log('an error happened during hydration', error)
-          } else {
-            const isNewUser = user && !localStorage.getItem(storageName);
-            if (isNewUser && state) {
-              state.sales = [];
-            }
+const createAppStore = (userId: string, firestore: any) => {
+  const productsCollection = collection(firestore, 'users', userId, 'products');
+  const salesCollection = collection(firestore, 'users', userId, 'sales');
+
+  return create<AppState>((set, get) => ({
+    products: [],
+    sales: [],
+    init: (products, sales) => set({ products, sales }),
+    addProduct: (product) => {
+      const newProduct = { ...product, stock: Number(product.stock) || 0 };
+      addDocumentNonBlocking(productsCollection, newProduct).then(docRef => {
+          if (docRef) {
+              set((state) => ({ products: [{...newProduct, id: docRef.id}, ...state.products] }));
           }
-        },
-      }
-    )
+      });
+    },
+    updateProduct: (product) => {
+      const productRef = doc(firestore, 'users', userId, 'products', product.id);
+      updateDocumentNonBlocking(productRef, product);
+      set((state) => ({
+        products: state.products.map((p) => (p.id === product.id ? product : p)),
+      }));
+    },
+    deleteProduct: (productId) => {
+      const productRef = doc(firestore, 'users', userId, 'products', productId);
+      deleteDocumentNonBlocking(productRef);
+      set((state) => ({
+        products: state.products.filter((p) => p.id !== productId),
+      }));
+    },
+    addSale: (sale) => {
+      const newSale = {
+        ...sale,
+        date: new Date().toISOString(),
+        total: sale.items.reduce((acc, item) => acc + item.priceAtSale * item.quantity, 0)
+      };
+
+      addDocumentNonBlocking(salesCollection, newSale).then(docRef => {
+        if(docRef) {
+          set((state) => ({ sales: [{...newSale, id: docRef.id}, ...state.sales] }));
+        }
+      });
+
+      const batch = writeBatch(firestore);
+      const currentProducts = get().products;
+
+      sale.items.forEach(item => {
+        const product = currentProducts.find(p => p.id === item.productId);
+        if (product) {
+          const productRef = doc(firestore, 'users', userId, 'products', item.productId);
+          const newStock = Math.max(0, product.stock - item.quantity);
+          batch.update(productRef, { stock: newStock });
+        }
+      });
+      batch.commit().catch(console.error);
+       set(state => ({
+          products: state.products.map(p => {
+              const saleItem = sale.items.find(item => item.productId === p.id);
+              if (saleItem) {
+                  return { ...p, stock: Math.max(0, p.stock - saleItem.quantity) };
+              }
+              return p;
+          })
+      }));
+    },
+  }));
+};
+
+const AppStoreContext = createContext<StoreApi<AppState> | null>(null);
+
+export const ProductStoreProvider = ({ children, user }: { children: ReactNode; user: User | null }) => {
+  const { firestore } = useFirebase();
+  const storeRef = useRef<StoreApi<AppState>>();
+  const userKey = user?.uid || 'guest';
+
+  // Keep a map of stores for each user
+  const [stores, setStores] = useState(new Map<string, StoreApi<AppState>>());
+
+  useEffect(() => {
+    if (!user || !firestore) {
+      storeRef.current = undefined;
+      return;
+    };
+
+    if (!stores.has(userKey)) {
+      const newStore = createAppStore(user.uid, firestore);
+      
+      const userDocRef = doc(firestore, 'users', user.uid);
+      getDoc(userDocRef).then(userDoc => {
+          if (!userDoc.exists()) {
+              // New user, seed initial data
+              const productsCollection = collection(firestore, 'users', user.uid, 'products');
+              const batch = writeBatch(firestore);
+              INITIAL_PRODUCTS.forEach(product => {
+                  const newDocRef = doc(productsCollection);
+                  batch.set(newDocRef, product);
+              });
+              batch.commit().then(() => {
+                  newStore.getState().init(INITIAL_PRODUCTS, []);
+              });
+              setDocumentNonBlocking(userDocRef, { initialized: true }, { merge: true });
+          } else {
+              // Existing user, load their data
+              const productsQuery = collection(firestore, 'users', user.uid, 'products');
+              const salesQuery = collection(firestore, 'users', user.uid, 'sales');
+
+              Promise.all([
+                  getDocs(productsQuery),
+                  getDocs(salesQuery)
+              ]).then(([productsSnapshot, salesSnapshot]) => {
+                  const products = productsSnapshot.docs.map(d => ({ ...d.data(), id: d.id })) as Product[];
+                  const sales = salesSnapshot.docs.map(d => ({ ...d.data(), id: d.id })) as Sale[];
+                  newStore.getState().init(products, sales);
+              });
+          }
+      });
+      
+      setStores(prevStores => new Map(prevStores).set(userKey, newStore));
+      storeRef.current = newStore;
+    } else {
+        storeRef.current = stores.get(userKey);
+    }
+  }, [user, firestore, userKey, stores]);
+  
+  if (!user) {
+    return <>{children}</>
+  }
+
+  if (!storeRef.current) {
+     return (
+       <div className="flex items-center justify-center h-screen">
+          <p>Loading data...</p>
+        </div>
+     );
+  }
+
+  return (
+    <AppStoreContext.Provider value={storeRef.current}>
+      {children}
+    </AppStoreContext.Provider>
   );
 };
 
 
-const AppStoreContext = createContext<StoreApi<AppState> | null>(null);
-
-const ProductStoreProvider = ({ children, user }: { children: ReactNode, user: User | null }) => {
-    const storeRef = useRef<StoreApi<AppState>>();
-    
-    // This part is crucial. We create a new store ONLY when the user changes.
-    // By using `user?.email` as a key, we force React to re-render and create a new provider
-    // with a new store when the user logs in or out.
-    const userKey = user?.email || 'guest';
-    
-    // We store the created stores in a map to avoid re-creating them on every render
-    const [stores, setStores] = useState(new Map<string, StoreApi<AppState>>());
-
-    if (!stores.has(userKey)) {
-        const newStore = createAppStore(user);
-        setStores(new Map(stores.set(userKey, newStore)));
-    }
-    
-    storeRef.current = stores.get(userKey);
-
-    return (
-        <AppStoreContext.Provider value={storeRef.current!}>
-            {children}
-        </AppStoreContext.Provider>
-    );
-}
-
-const useProductStore = <T,>(selector?: (state: AppState) => T): T | AppState => {
+export const useProductStore = <T>(selector: (state: AppState) => T): T => {
     const store = useContext(AppStoreContext);
     if (!store) {
-        throw new Error('useProductStore must be used within an AppStoreProvider');
+        throw new Error('useProductStore must be used within a AppStoreProvider');
     }
-    const state = useStore(store, selector || ((s) => s));
-    
-    const [hydrated, setHydrated] = useState(false);
-    useEffect(() => {
-        setHydrated(true);
-    }, []);
-
-    if (!hydrated) {
-        const initialState = store.getState();
-        if(selector){
-            return selector(initialState);
-        }
-        return initialState as AppState;
-    }
-    
-    return state;
+    return useStore(store, selector);
 };
-
-export { createAppStore as createProductStore, ProductStoreProvider, useProductStore };

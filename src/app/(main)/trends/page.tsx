@@ -51,10 +51,11 @@ import {
 } from "recharts";
 import { isWithinInterval, startOfDay } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Product, Sale } from "@/lib/types";
 
 export default function TrendsPage() {
   const { t } = useTranslation();
-  const { products, sales } = useProductStore() as { products: any[], sales: any[] };
+  const { products, sales } = useProductStore(state => ({ products: state.products as Product[], sales: state.sales as Sale[] }));
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
     to: new Date(),
@@ -63,6 +64,7 @@ export default function TrendsPage() {
   const [isReportDialogOpen, setReportDialogOpen] = useState(false);
 
   const filteredSales = useMemo(() => {
+    if (!sales) return [];
     return sales.filter(sale => {
       const saleDate = new Date(sale.date);
       if (date?.from && date?.to) {
@@ -75,6 +77,9 @@ export default function TrendsPage() {
   }, [sales, date]);
 
   const analysis = useMemo(() => {
+    if (!products || !filteredSales) {
+        return { totalSales: 0, totalItemsSold: 0, salesOverTime: [], top5Products: [], lowStockProducts: [] };
+    }
     const totalSales = filteredSales.reduce((acc, sale) => acc + sale.total, 0);
     const totalItemsSold = filteredSales.reduce((acc, sale) => acc + sale.items.reduce((itemAcc, item) => itemAcc + item.quantity, 0), 0);
 
@@ -280,5 +285,3 @@ export default function TrendsPage() {
     </div>
   );
 }
-
-    

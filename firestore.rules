@@ -1,54 +1,17 @@
-/**
- * @file Firestore Security Rules
- * @description This ruleset enforces a data-centric security model where access is determined by document existence and simple checks.
- *
- * Data Structure:
- * - /products/{productId}: Stores product information.
- * - /sales_transactions/{salesTransactionId}: Stores sales transaction records.
- * - /stock_adjustments/{stockAdjustmentId}: Stores stock adjustment records.
- *
- * Key Security Decisions:
- * - No user-specific data is stored, so there are no user-based access rules.
- * - All collections are secured against unauthorized modifications.
- */
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    /**
-     * @description Rules for the /products/{productId} collection.
-     * @path /products/{productId}
-     * @allow (get, list): Any user can read product information.
-     * @deny (create, update, delete): No one can create, update, or delete products via client-side rules.
-     * @principle Authorization is managed at the application level.
-     */
-    match /products/{productId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
-    }
-
-    /**
-     * @description Rules for the /sales_transactions/{salesTransactionId} collection.
-     * @path /sales_transactions/{salesTransactionId}
-     * @allow (get, list): Any user can read sales transaction records.
-     * @deny (create, update, delete): No one can create, update, or delete sales transactions via client-side rules.
-     * @principle Authorization is managed at the application level.
-     */
-    match /sales_transactions/{salesTransactionId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
-    }
-
-    /**
-     * @description Rules for the /stock_adjustments/{stockAdjustmentId} collection.
-     * @path /stock_adjustments/{stockAdjustmentId}
-     * @allow (get, list): Any user can read stock adjustment records.
-     * @deny (create, update, delete): No one can create, update, or delete stock adjustments via client-side rules.
-     * @principle Authorization is managed at the application level.
-     */
-    match /stock_adjustments/{stockAdjustmentId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
+    match /users/{userId} {
+      allow read, write: if request.auth.uid == userId;
+      
+      match /products/{productId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+      
+      match /sales/{saleId} {
+        allow read, write: if request.auth.uid == userId;
+      }
     }
   }
 }
