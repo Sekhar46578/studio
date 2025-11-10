@@ -135,9 +135,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         createdAt: new Date().toISOString(),
       }, { merge: true });
 
-      // Seed initial data for new user
-      await seedInitialData(userCredential.user.uid);
-
       return true;
     } catch (error: any) {
       toast({
